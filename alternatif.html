@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Alternatif Mimari — MOSFET Matrisi</title>
+<link rel="stylesheet" href="assets/bench.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <header class="top">
+    <div class="title">
+      <div class="eyebrow">Alternatif mimari · şarjda paralel, kullanımda seri · pafta 2 / 2</div>
+      <h1>MOSFET matrisi <span>1S3P ⇄ 3S1P</span></h1>
+    </div>
+
+    <div class="req" role="group" aria-label="Paket modu isteği">
+      <button data-req="CHARGE" aria-pressed="false">Şarj et · 1S3P</button>
+      <button data-req="USE" aria-pressed="false">Kullan · 3S1P</button>
+      <button data-req="IDLE" aria-pressed="true">Tümünü kapat</button>
+    </div>
+
+    <div class="transport">
+      <button class="btn primary" id="play"><span id="playIcon">▶</span> <span id="playText">Başlat</span> <span class="k">boşluk</span></button>
+      <button class="btn" id="reset">↺ Sıfırla</button>
+      <button class="btn" id="toEnd" title="Mevcut işlem bitene kadar hızlıca çalıştır">⏭ Sona git</button>
+      <select class="speed" id="speed" aria-label="Simülasyon hızı">
+        <option value="1">1×</option><option value="10">10×</option><option value="60">60×</option>
+        <option value="300" selected>300×</option><option value="1200">1200×</option>
+      </select>
+      <a class="btn" href="index.html">← Şarj tezgâhı</a>
+      <a class="btn" href="dogrulama.html">Doğrulama →</a>
+    </div>
+  </header>
+
+  <section class="display" aria-label="Anlık değerler">
+    <div class="rd"><span class="tag" id="rVtag">Paket gerilimi</span><div class="num" id="rV">—</div><div class="sub" id="rVs">—</div></div>
+    <div class="rd"><span class="tag" id="rItag">Paket akımı</span><div class="num" id="rI">—</div><div class="sub" id="rIs">—</div></div>
+    <div class="leds" aria-label="Topoloji">
+      <div class="led par" id="ledPar"><i></i>1S3P</div>
+      <div class="led ser" id="ledSer"><i></i>3S1P</div>
+      <div class="led flt" id="ledFlt"><i></i>ARIZA</div>
+    </div>
+    <div class="rd mid"><span class="tag">Hücre farkı ΔV</span><div class="num" id="rD">—</div><div class="sub" id="rDs">—</div></div>
+    <div class="rd mid"><span class="tag">Ortalama SOC</span><div class="num" id="rS">—</div><div class="sub" id="rSs">—</div></div>
+    <div class="rd mid"><span class="tag">Süre</span><div class="num" id="rt">—</div><div class="sub" id="rts">—</div></div>
+    <div class="rd state" id="rStateBox"><span class="tag">Denetleyici</span><div class="num" id="rState">—</div><div class="sub" id="rStates">—</div></div>
+  </section>
+
+  <main class="main">
+    <section class="sheet" id="sheet" aria-label="MOSFET matrisi şeması"></section>
+    <section class="plots">
+      <div class="plot">
+        <div class="plot-head"><span class="eyebrow">Hücre akımları — zaman (dk)</span></div>
+        <div class="plotbox"><canvas id="chI" aria-label="Hücre akımları grafiği"></canvas></div>
+        <div class="keys"><span><i style="color:var(--c1)"></i>H1</span><span><i style="color:var(--c2)"></i>H2</span><span><i style="color:var(--c3)"></i>H3</span><span><i class="dash" style="color:var(--ink)"></i>toplam (+ şarj / − yük)</span></div>
+      </div>
+      <div class="plot">
+        <div class="plot-head">
+          <div class="seg" role="group" aria-label="İkinci grafik">
+            <button data-plot="v" aria-pressed="true">Hücre gerilimleri</button>
+            <button data-plot="soc" aria-pressed="false">SOC</button>
+          </div>
+        </div>
+        <div class="plotbox"><canvas id="ch2" aria-label="Hücre gerilimi veya SOC grafiği"></canvas></div>
+        <div class="keys"><span><i style="color:var(--c1)"></i>H1</span><span><i style="color:var(--c2)"></i>H2</span><span><i style="color:var(--c3)"></i>H3</span></div>
+      </div>
+    </section>
+  </main>
+
+  <section class="drawer">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="scen" aria-selected="true">Senaryolar</button>
+      <button class="tab" role="tab" data-tab="gates" aria-selected="false">Anahtarlar ve gate sürücü</button>
+      <button class="tab" role="tab" data-tab="cmp" aria-selected="false">Rev B ile karşılaştırma</button>
+      <button class="tab" role="tab" data-tab="params" aria-selected="false">Parametreler</button>
+      <button class="tab" role="tab" data-tab="log" aria-selected="false">Olay günlüğü</button>
+      <button class="tab" role="tab" data-tab="bom" aria-selected="false">Malzeme listesi</button>
+    </div>
+    <div class="panel" data-panel="scen"><div class="scen" id="scenList"></div></div>
+    <div class="panel" data-panel="gates" hidden>
+      <div class="gd">
+        <section class="gd-arch">
+          <div class="h4">Sürme mimarisi</div>
+          <ol class="flow">
+            <li><b>Arduino</b>: D2 veri · D3 saat · D4 mandal · D5 OE (4 pin)</li>
+            <li><b>2× 74HC595</b>: 10 gate biti. OE pull-up'lı → Arduino resetlenirse tüm çıkışlar kapalı</li>
+            <li><b>Grup beslemesi kilidi</b>: PAR ve SER sürücü LED'leri ayrı beslemeden; biri sönmeden diğeri açılamaz (<span id="gdHw">5 ms</span> gecikme)</li>
+            <li id="gdDrvLi"><b>10× VOM1271</b> fotovoltaik sürücü: LED 10 mA → izoleli ~8.4 V gate gerilimi</li>
+            <li><b>Her anahtar</b>: sırt sırta 2 N-MOSFET, ortak source. Kapalıyken iki yönde de bloklar</li>
+          </ol>
+          <div id="gdParams"></div>
+        </section>
+        <section>
+          <div class="h4">Moda göre gate komutları</div>
+          <table class="gates" id="gateTable"></table>
+          <div class="h4" style="margin-top:10px">Anahtar başına sürme koşulu</div>
+          <table class="gates drv" id="drvTable"></table>
+        </section>
+        <section>
+          <div class="h4">Son geçişin zamanlaması</div>
+          <div id="timing"></div>
+          <p class="hint" id="timingNote"></p>
+        </section>
+      </div>
+    </div>
+    <div class="panel" data-panel="cmp" hidden><div id="cmp"><p class="empty">Hesaplanıyor…</p></div></div>
+    <div class="panel" data-panel="params" hidden><div class="params" id="params"></div></div>
+    <div class="panel" data-panel="log" hidden><div class="log" id="log"></div></div>
+    <div class="panel" data-panel="bom" hidden><div id="bom"></div></div>
+  </section>
+</div>
+
+<script src="assets/a28-model.js"></script>
+<script src="assets/charger-a.js"></script>
+<script src="assets/scenarios-a.js"></script>
+<script src="assets/reconfig-model.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/schematic.js"></script>
+<script src="assets/schematic-c.js"></script>
+<script src="assets/bom.js"></script>
+<script src="assets/alt.js"></script>
+</body>
+</html>

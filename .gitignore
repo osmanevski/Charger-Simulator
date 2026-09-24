@@ -1,0 +1,13 @@
+# macOS
+.DS_Store
+._*
+
+# Ortam / gizli ayarlar (sunucuya scp ile gönderilir, depoya girmez)
+.env
+.env.*
+*.local
+secrets/
+
+# Araçlar
+node_modules/
+*.log

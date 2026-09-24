@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Şarj Tezgâhı — 3S A28</title>
+<link rel="stylesheet" href="assets/bench.css">
+</head>
+<body>
+<div class="app revB" id="app">
+
+  <header class="top">
+    <div class="title">
+      <div class="eyebrow">EEM bitirme projesi · Li-ion şarj devresi tasarımı</div>
+      <h1>Şarj tezgâhı <span>3S · INR18650A28</span></h1>
+    </div>
+
+    <div class="req" role="group" aria-label="Paket kullanımı">
+      <button data-req="CHARGE" aria-pressed="true" title="Adaptör takılı, yük yok (C)">Şarj et</button>
+      <button data-req="USE" aria-pressed="false" title="Adaptör çekili, 2.9 A yük (K)">Kullan</button>
+      <button data-req="REST" aria-pressed="false" title="Adaptör ve yük yok (W)">Beklet</button>
+    </div>
+
+    <div class="transport">
+      <button class="btn primary" id="play"><span id="playIcon">▶</span> <span id="playText">Başlat</span> <span class="k">boşluk</span></button>
+      <button class="btn" id="reset">↺ Sıfırla</button>
+      <button class="btn" id="toEnd" title="Şarj bitene kadar hızlıca çalıştır (en fazla 5 saat)">⏭ Sona git</button>
+      <select class="speed" id="speed" aria-label="Simülasyon hızı">
+        <option value="1">1×</option><option value="10">10×</option><option value="60">60×</option>
+        <option value="300" selected>300×</option><option value="1200">1200×</option>
+      </select>
+      <a class="btn" href="alternatif.html">Alternatif</a>
+      <a class="btn" href="dogrulama.html">Doğrulama →</a>
+    </div>
+  </header>
+
+  <section class="display" aria-label="Anlık değerler">
+    <div class="rd"><span class="tag">Paket gerilimi</span><div class="num" id="rV">—</div><div class="sub" id="rVs">—</div></div>
+    <div class="rd"><span class="tag" id="rItag">Paket akımı</span><div class="num" id="rI">—</div><div class="sub" id="rIs">—</div></div>
+    <div class="leds" aria-label="Regülasyon modu">
+      <div class="led cv" id="ledCV"><i></i>CV</div>
+      <div class="led cc" id="ledCC"><i></i>CC</div>
+      <div class="led dsg" id="ledDSG"><i></i>YÜK</div>
+    </div>
+    <div class="rd mid"><span class="tag">Hücre sıcaklığı</span><div class="num" id="rT">—</div><div class="sub" id="rTs">—</div></div>
+    <div class="rd mid"><span class="tag">Ortalama SOC</span><div class="num" id="rS">—</div><div class="sub" id="rSs">—</div></div>
+    <div class="rd mid"><span class="tag">Süre</span><div class="num" id="rt">—</div><div class="sub" id="rts">—</div></div>
+    <div class="rd state" id="rStateBox"><span class="tag">Firmware durumu</span><div class="num" id="rState">—</div><div class="sub" id="rStates">—</div></div>
+  </section>
+
+  <main class="main">
+    <section class="sheet" id="sheet" aria-label="Devre şeması"></section>
+
+    <section class="plots">
+      <div class="plot dual">
+        <div class="plot-head">
+          <span class="eyebrow">Paket gerilimi · paket akımı — zaman (dk)</span>
+          <label class="chk"><input type="checkbox" id="showDs" checked> Datasheet eğrisi</label>
+        </div>
+        <div class="plotbox"><canvas id="chV" aria-label="Paket gerilimi grafiği"></canvas></div>
+        <div class="plotbox"><canvas id="chI" aria-label="Paket akımı grafiği"></canvas></div>
+        <div class="keys">
+          <span><i style="color:var(--ink)"></i>V gerçek</span>
+          <span><i class="dash" style="color:var(--fault)"></i>V Arduino'nun ölçtüğü</span>
+          <span><i style="color:var(--a28)"></i>+ şarj</span>
+          <span><i style="color:var(--cc)"></i>− deşarj</span>
+          <span><i class="ring" style="color:var(--cc)"></i>A28 datasheet <span id="dsNote"></span></span>
+        </div>
+      </div>
+      <div class="plot">
+        <div class="plot-head">
+          <div class="seg" role="group" aria-label="İkinci grafik">
+            <button data-plot="cells" aria-pressed="true">Hücre gerilimleri</button>
+            <button data-plot="temp" aria-pressed="false">Sıcaklık ve PWM</button>
+          </div>
+        </div>
+        <div class="plotbox"><canvas id="ch2" aria-label="Hücre gerilimleri veya sıcaklık grafiği"></canvas></div>
+        <div class="keys" id="keys2"></div>
+      </div>
+    </section>
+  </main>
+
+  <section class="drawer">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="scen" aria-selected="true">Senaryolar</button>
+      <button class="tab" role="tab" data-tab="part" aria-selected="false">Bileşen</button>
+      <button class="tab" role="tab" data-tab="ard" aria-selected="false">Arduino</button>
+      <button class="tab" role="tab" data-tab="checks" aria-selected="false">Tasarım kontrolleri<span class="cnt" id="checkCnt" hidden></span></button>
+      <button class="tab" role="tab" data-tab="params" aria-selected="false">Parametreler</button>
+      <button class="tab" role="tab" data-tab="log" aria-selected="false">Olay günlüğü</button>
+      <button class="tab" role="tab" data-tab="rev" aria-selected="false">Revizyonlar</button>
+      <button class="tab" role="tab" data-tab="cyc" aria-selected="false">Çevrim testi</button>
+      <button class="tab" role="tab" data-tab="bom" aria-selected="false">Malzeme listesi</button>
+    </div>
+
+    <div class="panel" data-panel="scen">
+      <div class="scen" id="scenList"></div>
+    </div>
+    <div class="panel" data-panel="part" hidden><div id="inspector"></div></div>
+    <div class="panel" data-panel="ard" hidden>
+      <div class="ard">
+        <div>
+          <div class="lcd" aria-label="LCD ekran"><div id="lcd1"></div><div id="lcd2"></div></div>
+          <p class="hint">16×2 paralel LCD (D2–D6, D8), firmware'in gösterdiği metin</p>
+        </div>
+        <div><table id="measTable"></table></div>
+        <div>
+          <div class="h4">Durum makinesi</div>
+          <div class="fsm" id="fsm"></div>
+          <p class="why-now" id="whyNow"></p>
+        </div>
+      </div>
+    </div>
+    <div class="panel" data-panel="checks" hidden><table id="checks"></table></div>
+    <div class="panel" data-panel="params" hidden><div class="params" id="params"></div></div>
+    <div class="panel" data-panel="log" hidden><div class="log" id="log"></div></div>
+    <div class="panel" data-panel="rev" hidden><div id="revList"></div></div>
+    <div class="panel" data-panel="bom" hidden><div id="bom"></div></div>
+    <div class="panel" data-panel="cyc" hidden>
+      <div class="cyc">
+        <div class="cyc-ctl">
+          <p class="hint" style="margin-top:0">Her çevrim: şarj → 30 dk dinlenme → 2.9 A kullanım (cihaz paket 9.0 V'ta keser) → depolama. Hücreler gerçekçi dağılımla başlar: kapasite, kendi kendine boşalma ve coulomb verimi farklı.</p>
+          <label class="field"><span>Çevrim sayısı</span><input type="number" id="cycN" value="30" min="2" max="100"></label>
+          <label class="field"><span>Depolama (gün / çevrim)</span><input type="number" id="cycRest" value="7" min="0" max="60"></label>
+          <label class="field"><span>Cihaz düşük pil kesmesi</span><span><input type="number" id="cycCut" value="9.0" step="0.1" min="7.5" max="10.5"> V</span></label>
+          <button class="btn primary" id="cycRun">BMS var ↔ yok karşılaştır</button>
+          <div class="cyc-prog"><i id="cycProg"></i></div>
+          <div id="cycSum" class="cyc-sum"></div>
+        </div>
+        <div class="cyc-chart"><div class="h4">Dolu pakette hücreler arası SOC farkı (%)<span class="keys" style="display:inline-flex;margin-left:10px"><span><i style="color:var(--cv)"></i>BMS var</span><span><i style="color:var(--fault)"></i>BMS yok</span></span></div><div class="plotbox"><canvas id="cycSpread"></canvas></div></div>
+        <div class="cyc-chart"><div class="h4">Deşarj sonunda en düşük hücre (V)<span class="keys" style="display:inline-flex;margin-left:10px"><span><i style="color:var(--cv)"></i>BMS var</span><span><i style="color:var(--fault)"></i>BMS yok</span></span></div><div class="plotbox"><canvas id="cycMin"></canvas></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="assets/a28-model.js"></script>
+<script src="assets/charger-a.js"></script>
+<script src="assets/scenarios-a.js"></script>
+<script src="assets/charts.js"></script>
+<script src="assets/schematic.js"></script>
+<script src="assets/bom.js"></script>
+<script src="assets/bench.js"></script>
+</body>
+</html>

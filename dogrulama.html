@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Doğrulama Raporu — 3S A28</title>
+<link rel="stylesheet" href="assets/bench.css">
+<style>
+  body { background: var(--paper); }
+  .doc { max-width: 1060px; margin: 0 auto; padding: 18px 18px 40px; }
+  .doc-top { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 14px; }
+  .doc-top h1 { margin: 0; font-family: var(--font-display); font-stretch: 125%; font-weight: 800; font-size: 26px; line-height: 1.05; }
+  .doc-top h1 span { color: var(--a28); }
+  .page { background: var(--sheet); border: 1px solid var(--rule); padding: 26px 30px 30px; }
+  .page + .page { margin-top: 14px; }
+  .page h2 { margin: 0 0 4px; font-family: var(--font-display); font-stretch: 112%; font-weight: 800; font-size: 19px; }
+  .page .lead { color: var(--ink-2); margin: 0 0 14px; max-width: 78ch; }
+  .verdict-box { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border: 1.5px solid var(--ink); }
+  .verdict-box > div { padding: 12px 14px; border-left: 1px solid var(--rule); }
+  .verdict-box > div:first-child { border-left: 0; }
+  .verdict-box .big { font-family: var(--font-data); font-weight: 700; font-size: 28px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .verdict-box .big.bad { color: var(--fault); } .verdict-box .big.ok { color: var(--cv); }
+  .verdict-box p { margin: 4px 0 0; font-size: 13px; color: var(--ink-2); }
+  .stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; border-top: 1.5px solid var(--ink); border-bottom: 1px solid var(--rule); margin: 6px 0 14px; }
+  .stats > div { padding: 8px 12px 10px 0; }
+  .stats .v { font-family: var(--font-data); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .stats .s { font-size: 12px; color: var(--ink-2); }
+  .chartbox { height: 300px; border: 1px solid var(--rule); background: #fff; position: relative; }
+  .chartbox canvas { position: absolute; inset: 6px 8px; width: calc(100% - 16px); height: calc(100% - 12px); display: block; }
+  .matrix td { font-size: 13px; }
+  .matrix .nums { color: var(--ink-3); font-size: 11.5px; font-family: var(--font-data); font-stretch: 87%; font-variant-numeric: tabular-nums; }
+  .mk { font-family: var(--font-mono); font-weight: 700; width: 18px; display: inline-block; }
+  .mk.ok { color: var(--cv); } .mk.warn { color: #b7791f; } .mk.bad { color: var(--fault); }
+  .progress { height: 3px; background: var(--grid); margin: 8px 0 12px; } .progress i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .2s; }
+  ul.assume { margin: 0; padding-left: 18px; color: var(--ink-2); } ul.assume li { margin: 5px 0; } ul.assume b { color: var(--ink); }
+  .keys { margin-top: 6px; }
+  @media (max-width: 720px) {
+    .page { padding: 18px 16px; }
+    .verdict-box, .stats { grid-template-columns: minmax(0, 1fr); }
+    .verdict-box > div { border-left: 0; border-top: 1px solid var(--rule); }
+    .table-scroll { overflow-x: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="doc-top">
+    <div>
+      <div class="eyebrow" style="font-size:11px;color:var(--ink-3)">Test raporu · tarayıcıda yeniden hesaplanır</div>
+      <h1>Doğrulama <span>3S · INR18650A28</span></h1>
+    </div>
+    <a class="btn" href="index.html">← Şarj tezgâhı</a>
+  </div>
+
+  <section class="page">
+    <h2>Sonuç</h2>
+    <p class="lead">Aynı başlangıç (3 hücre %20 SOC, 25 °C), iki devre revizyonu. Rakamlar bu sayfa açılırken simülasyonla üretilir.</p>
+    <div class="verdict-box" id="verdict"></div>
+  </section>
+
+  <section class="page">
+    <h2>Hücre modeli, datasheet'e karşı</h2>
+    <p class="lead">Noktalar: ASPİLSAN A28 datasheet'indeki 0.5C CC/CV şarj grafiğinden sayısallaştırılan değerler. Çizgiler: aynı test koşulunda modelin çıktısı (1.4 A → 4.20 V → 140 mA, 25 °C).</p>
+    <div class="stats" id="cellStats"></div>
+    <div class="chartbox"><canvas id="chCell"></canvas></div>
+    <div class="keys"><span><i style="color:var(--ink)"></i>model gerilimi</span><span><i class="ring" style="color:var(--ink)"></i>datasheet gerilimi</span><span><i style="color:var(--a28)"></i>model akımı</span><span><i class="ring" style="color:var(--a28)"></i>datasheet akımı</span></div>
+  </section>
+
+  <section class="page">
+    <h2>Deşarj: model, datasheet'e karşı</h2>
+    <p class="lead">Datasheet'in "C-rate Dependency" grafiğindeki 2.9 A (≈1C) eğrisi; tam dolu hücre, 25 °C, 2.5 V'a kadar. Model aynı koşulda. Son %5'lik dizde model biraz yüksek kalıyor: OCV eğrisi şarj grafiğinden türetildi ve düşük SOC'ta gerçek hücrede şarj/deşarj histerezisi var.</p>
+    <div class="stats" id="dsgStats"></div>
+    <div class="chartbox"><canvas id="chDsg"></canvas></div>
+    <div class="keys"><span><i style="color:var(--cc)"></i>model gerilimi</span><span><i class="ring" style="color:var(--cc)"></i>datasheet, 2.9 A</span></div>
+  </section>
+
+  <section class="page">
+    <h2>Rev A ve Rev B, normal şarj</h2>
+    <p class="lead">Rev A'da 1 Ω low-side şönt, Arduino'nun paket gerilimini I·R kadar yüksek okumasına yol açıyor (kesikli çizgi). "12.6 V" okunduğunda gerçek paket ~11.6 V. CV'ye geçilince doğrudan FB kontrolü çıkışı kesiyor, akım 0 okunuyor ve onay süresi olmadığı için şarj hemen "tamam" sayılıyor.</p>
+    <div class="chartbox"><canvas id="chCmp"></canvas></div>
+    <div class="keys"><span><i style="color:var(--ink)"></i>Rev B paket V</span><span><i style="color:var(--a28)"></i>Rev B akım</span><span><i style="color:var(--fault)"></i>Rev A paket V (gerçek)</span><span><i class="dash" style="color:var(--fault)"></i>Rev A, Arduino'nun ölçtüğü</span><span><i style="color:var(--cc)"></i>Rev A akım</span></div>
+  </section>
+
+  <section class="page">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap"><h2>Senaryo matrisi</h2><button class="btn" id="rerun">↻ Yeniden hesapla</button></div>
+    <p class="lead"><span class="mk ok">✓</span> beklenen güvenli davranış · <span class="mk warn">!</span> güvenli ama performans kaybı · <span class="mk bad">✕</span> güvenlik ya da işlev sorunu. Her senaryo en fazla 5 saat simüle edilir.</p>
+    <div class="progress"><i id="prog"></i></div>
+    <div class="table-scroll"><table class="matrix" id="matrix"></table></div>
+  </section>
+
+  <section class="page">
+    <h2>Hangi karar neye mal oluyor?</h2>
+    <p class="lead">Rev B'den başlanır ve Rev A'daki kararlardan <b>yalnızca biri</b> geri alınır. Böylece her kararın etkisi ayrı ayrı görülür.</p>
+    <div class="table-scroll"><table class="matrix" id="ablation"></table></div>
+  </section>
+
+  <section class="page">
+    <h2>BMS'in etkisi: 30 çevrim</h2>
+    <p class="lead">Hücreler aynı partiden ama birebir aynı değil: kapasite %100 / %98.5 / %97, iç direnç 1.00 / 1.07 / 0.96, kendi kendine boşalma ayda %2.0 / %3.0 / %2.2, coulomb verimi farkı çevrim başına ~%0.04. Her çevrim: şarj → 30 dk dinlenme → 2.9 A kullanım (cihaz paket 9.0 V'ta keser) → 7 gün depolama. Seri pakette her hücreden aynı akım geçtiği için bu farklar SOC'u zamanla kaydırır; BMS'in pasif balansı bunu her şarj sonunda geri toplar.</p>
+    <div class="verdict-box" id="cycBox"><div><p class="empty">Hesaplanıyor…</p></div></div>
+    <div class="stats" style="grid-template-columns:1fr 1fr;border:0;margin-top:14px">
+      <div><div class="h4" style="margin-bottom:4px">Dolu pakette hücreler arası SOC farkı (%)</div><div class="chartbox" style="height:220px"><canvas id="chCycS"></canvas></div></div>
+      <div><div class="h4" style="margin-bottom:4px">Deşarj sonunda en düşük hücre (V)</div><div class="chartbox" style="height:220px"><canvas id="chCycM"></canvas></div></div>
+    </div>
+    <div class="keys"><span><i style="color:var(--cv)"></i>BMS var</span><span><i style="color:var(--fault)"></i>BMS yok</span></div>
+  </section>
+
+  <section class="page">
+    <h2>Alternatif mimari: MOSFET matrisi</h2>
+    <p class="lead">Aynı dengesiz paket (%40 / %25 / %18) önce şarj edilip, 10 dk dinlendirilip 2.9 A ile kullanılıyor. Rev B'de hücreler seri şarj edilir; en dolu hücre 4.20 V'a ulaşınca şarj biter. Matriste hücreler paralel şarj edildiği için hepsi aynı gerilimde dolar. Ayrıntılar ve canlı simülasyon: <a href="alternatif.html">alternatif.html</a>.</p>
+    <div class="verdict-box" id="altBox"><div><p class="empty">Hesaplanıyor…</p></div></div>
+    <p class="lead" style="margin-top:12px">Bedeli: 8 ana + 2 ön eşitleme MOSFET'i ve izoleli gate sürücüleri; standart 3S BMS kullanılamaz. Seri ve paralel anahtarlar aynı anda iletirse ≈ 85 A kısa devre oluşur, yani donanımsal kilitleme şarttır. Paralel akım paylaşımı yol direncine bağlı olduğundan eşit değildir (H1 &gt; H2 &gt; H3). Yaşlı ya da düşük kapasiteli bir hücre, seri kullanımda iki mimaride de kapasiteyi sınırlar.</p>
+  </section>
+
+  <section class="page">
+    <h2>Model varsayımları ve sınırlar</h2>
+    <ul class="assume">
+      <li><b>Hücre:</b> 1RC Thevenin (R0 30 mΩ, R1 20 mΩ, τ 45 s), 2.83 Ah. R0+R1, datasheet'teki CV akım sönüm süresine (1.4 → 0.14 A ≈ 16.5 dk) oturuyor. Datasheet ACIR ≤ 20 mΩ (1 kHz); DC direnç tipik olarak 1.5–2.5 katıdır.</li>
+      <li><b>OCV–SOC:</b> datasheet CC eğrisinden I·R düşümü çıkarılarak türetildi. Histerezis ve yaşlanma modellenmedi; yaşlanma senaryosunda kapasite ve direnç ölçeklenir.</li>
+      <li><b>Sıcaklık:</b> hücre başına 44.5 J/K ve 15 K/W. 1C'de datasheet ile uyumlu (≈ +6 K); 2C üstünde ısınmayı olduğundan fazla gösterir.</li>
+      <li><b>XL4015:</b> ortalama model (datasheet: V_FB 1.225–1.275 V, VFB = 0 V'ta duty %100, min. düşüm 0.3 V). Anahtarlama dalgalanması yok. PWM arabirimi TI SLVA861 Denk. 3: Vout = V_tavan − R_üst·max(0, V_PWM − V_D − 1.25)/(R4 + R3); CV potu yerine sabit R_üst: V_tavan = V_FB·(1 + R_üst/R_alt), R_alt 1 kΩ, R_üst ölçülerek 12.60 V'a düzeltilmiş (ayarsızken V_FB ±%2 → 12.37–12.88 V); R3 5.1 kΩ, R4 1 kΩ, D1 1N4148.</li>
+      <li><b>BMS:</b> tipik 3S balanslı kart (OVP 4.25 V / 1 s, bırakma 4.15 V, UVP 2.50 V, ≥ 4.18 V'ta 60 mA balans). Kullanılan kartın kendi eşikleri girilmelidir.</li>
+      <li><b>Ölçüm:</b> 10-bit ADC, referans 5 V hattı, ±0.5 LSB gürültü, 16 örnek ortalama. Rev B: 0.1 Ω low-side şönt + LM358 ×10 (3 mV ofset, açılışta sıfırlanır), 10k/4.7k bölücü (%1.2 oran hatası), multimetreyle tek nokta kalibrasyon (kalan %0.1). Karşılaştırma için INA219: 4 mV / 0.1 mA LSB, %0.3 kazanç hatası.</li>
+      <li><b>Kapsam:</b> şarj 0–4 A, deşarj ≤ 3 A, −10…60 °C. Kontrol mantığı ve sistem davranışı simülasyonudur; SPICE analizi veya güvenlik sertifikasyonu yerine geçmez. Aynı kontroller: <code>node tests/run-tests.js</code></li>
+    </ul>
+  </section>
+</div>
+
+<script src="assets/a28-model.js"></script>
+<script src="assets/charger-a.js"></script>
+<script src="assets/scenarios-a.js"></script>
+<script src="assets/reconfig-model.js"></script>
+<script src="assets/charts.js"></script>
+<script>
+(function () {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : '—';
+  const icon = { ok: '✓', warn: '!', bad: '✕' };
+  const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+
+  // Model ↔ datasheet
+  const ref = A28.runReferenceCharge({ soc0: 0.015 }), DS = A28.DATASHEET_CHARGE_05C;
+  let se = 0; DS.forEach(([t, v]) => { const p = ref.reduce((a, b) => Math.abs(b.t - t) < Math.abs(a.t - t) ? b : a); se += (p.v - v) ** 2; });
+  const cv = ref.find(p => p.i < 1.399).t, end = ref[ref.length - 1];
+  const st = (v, s) => `<div><div class="v">${v}</div><div class="s">${s}</div></div>`;
+  $('cellStats').innerHTML = st(`${fmt(Math.sqrt(se / DS.length) * 1000, 1)} mV`, 'gerilim RMSE') + st(`${fmt(cv, 1)} dk`, 'CC→CV · datasheet ≈ 114.5') +
+    st(`${fmt(end.t, 1)} dk`, 'bitiş · datasheet ≈ 131') + st(`${fmt(end.q * 1000, 0)} mAh`, 'kapasite · datasheet ≈ 2832');
+  const chCell = new LineChart($('chCell'), { xLabel: 'dk',
+    left: { min: 3.2, max: 4.4, label: 'V', color: cssv('--ink') }, right: { min: 0, max: 1.6, label: 'A', color: cssv('--a28') },
+    series: [{ key: 'v', color: cssv('--ink'), label: 'model V' }, { key: 'i', color: cssv('--a28'), axis: 'right', label: 'model I' }] });
+  const drawCell = () => chCell.draw(ref, { xMax: 140, overlays: [
+    { points: DS.map(p => [p[0], p[1]]), axis: 'left', color: cssv('--ink'), hollow: true },
+    { points: DS.map(p => [p[0], p[2]]), axis: 'right', color: cssv('--a28'), hollow: true }] });
+
+  // Deşarj ↔ datasheet
+  const dref = A28.runReferenceDischarge({ i: 2.9 }), DD = A28.DATASHEET_DISCHARGE_29A;
+  let sd = 0, nd = 0, knee = 0;
+  DD.forEach(([q, v]) => { const p = dref.reduce((a, b) => Math.abs(b.q - q) < Math.abs(a.q - q) ? b : a);
+    if (q <= 2.6) { sd += (p.v - v) ** 2; nd++; } else if (q < 2.8) knee = Math.max(knee, Math.abs(p.v - v)); });
+  const dEnd = dref[dref.length - 1];
+  $('dsgStats').innerHTML = st(`${fmt(Math.sqrt(sd / nd) * 1000, 1)} mV`, 'RMSE, 0–2.6 Ah') + st(`${fmt(knee * 1000, 0)} mV`, 'maks. sapma, diz bölgesi') +
+    st(`${fmt(dEnd.q * 1000, 0)} mAh`, 'kapasite · datasheet ≈ 2820') + st(`+${fmt(dEnd.T - 25, 1)} K`, 'ısınma · datasheet ≈ +6');
+  const chDsg = new LineChart($('chDsg'), { xLabel: 'Ah', left: { min: 2.4, max: 4.3, label: 'V', color: cssv('--ink') },
+    series: [{ key: 'v', color: cssv('--cc'), label: 'model V' }] });
+  const drawDsg = () => chDsg.draw(dref, { xKey: 'q', xMax: 3, overlays: [{ points: DD, axis: 'left', color: cssv('--cc'), hollow: true }] });
+
+  // Rev A ↔ Rev B
+  const run = p => { const s = new ChargerA.SystemA(ChargerA.presetFor(p)); s.runUntilDone(4); return s; };
+  const B = run('improved'), A = run('report');
+  const chCmp = new LineChart($('chCmp'), { xLabel: 'dk',
+    left: { min: 10, max: 13.2, label: 'V', color: cssv('--ink') }, right: { min: 0, max: 1.6, label: 'A', color: cssv('--a28') },
+    series: [
+      { key: 'v', rows: B.history, color: cssv('--ink'), label: 'B V' }, { key: 'i', rows: B.history, color: cssv('--a28'), axis: 'right', label: 'B I', width: 1.5 },
+      { key: 'v', rows: A.history, color: cssv('--fault'), label: 'A V' }, { key: 'vMeas', rows: A.history, color: cssv('--fault'), dash: [5, 4], width: 1.4, label: 'A ölçülen' },
+      { key: 'i', rows: A.history, color: cssv('--cc'), axis: 'right', label: 'A I', width: 1.5 }],
+    refLines: [{ axis: 'left', value: 12.6, color: cssv('--ink-3'), label: '12.60 V', right: true }] });
+  const drawCmp = () => chCmp.draw(B.history, { xScale: 1 / 60 });
+  const sa = A.summary(), sb = B.summary();
+  $('verdict').innerHTML =
+    `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">Rev A · final rapordaki devre</span><div class="big bad">%${fmt(avg(sa.finalSoc) * 100, 0)} SOC</div><p>${fmt(sa.doneMin, 0)}. dakikada "şarj tamam" dedi; paket gerçekte ${fmt(A.cells.reduce((a, c) => a + c.ocv, 0), 2)} V'ta.</p></div>` +
+    `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">Rev B · önerilen devre</span><div class="big ok">%${fmt(avg(sb.finalSoc) * 100, 1)} SOC</div><p>${fmt(sb.doneMin, 0)} dakikada tamamlandı; en yüksek hücre ${fmt(sb.maxCellV, 3)} V.</p></div>` +
+    `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">Rev B · hücre ≤ 4.20 V</span><div class="big" id="vScore">…</div><p id="vScoreS">Senaryo matrisi hesaplanıyor.</p></div>`;
+
+  // Matris ve ablasyon
+  const cell = o => `<span class="mk ${o.verdict.level}">${icon[o.verdict.level]}</span>${o.verdict.note}<div class="nums">${o.r.state} · ${o.r.doneMin != null ? fmt(o.r.doneMin, 0) + ' dk · ' : ''}maks. ${fmt(o.r.maxCellV, 3)} V · ${fmt(o.r.maxTemp, 1)} °C · ${fmt(o.r.chargedAh * 1000, 0)} mAh</div>`;
+  function runAll() {
+    const S = ScenariosA, jobs = [];
+    S.SCENARIOS.forEach(sc => ['improved', 'report'].forEach(p => jobs.push({ k: 'm', sc, p })));
+    const two = ['normal', 'imbalance'].map(id => S.SCENARIOS.find(x => x.id === id));
+    S.ABLATIONS.forEach(a => two.forEach(sc => jobs.push({ k: 'a', sc, a })));
+    const M = {}, AB = {}; let i = 0;
+    $('matrix').innerHTML = $('ablation').innerHTML = '<tr><td class="empty">Hesaplanıyor…</td></tr>';
+    const step = () => {
+      const t0 = performance.now();
+      while (i < jobs.length && performance.now() - t0 < 40) {
+        const j = jobs[i++];
+        if (j.k === 'm') (M[j.sc.id] ||= {})[j.p] = S.runScenario(j.sc, j.p);
+        else (AB[j.a.id] ||= {})[j.sc.id] = S.runScenario(j.sc, j.a.preset || 'improved', j.a.mod);
+      }
+      $('prog').style.width = (i / jobs.length * 100) + '%';
+      if (i < jobs.length) return setTimeout(step, 0);
+      $('matrix').innerHTML = '<tr><th>Senaryo</th><th>Rev B · önerilen</th><th>Rev A · final rapor</th></tr>' +
+        S.SCENARIOS.map(sc => `<tr><td><b>${sc.name}</b><div class="nums">${sc.desc}</div></td><td>${cell(M[sc.id].improved)}</td><td>${cell(M[sc.id].report)}</td></tr>`).join('');
+      $('ablation').innerHTML = '<tr><th>Geri alınan karar</th><th>Normal şarj</th><th>Dengesiz hücreler</th></tr>' +
+        S.ABLATIONS.map(a => `<tr><td><b>${a.name}</b></td><td>${cell(AB[a.id].normal)}</td><td>${cell(AB[a.id].imbalance)}</td></tr>`).join('');
+      const safeB = S.SCENARIOS.filter(sc => M[sc.id].improved.r.maxCellV <= 4.21).length;
+      const badA = S.SCENARIOS.filter(sc => M[sc.id].report.verdict.level === 'bad').length;
+      $('vScore').textContent = `${safeB} / ${S.SCENARIOS.length} senaryo`;
+      $('vScore').className = 'big ' + (safeB === S.SCENARIOS.length ? 'ok' : 'bad');
+      $('vScoreS').textContent = `Rev A ise ${badA} senaryoda güvenlik ya da işlev sorunu gösteriyor (aşağıdaki matris).`;
+    };
+    step();
+  }
+  $('rerun').addEventListener('click', runAll);
+
+  // BMS'in etkisi: çevrim testi (arka planda, çevrim çevrim)
+  (function cycles() {
+    const N = 30, data = { yes: [], no: [] };
+    const gens = [['yes', ScenariosA.cycleTest({ bms: true, cycles: N })], ['no', ScenariosA.cycleTest({ bms: false, cycles: N })]];
+    const opts = ro => ({ xLabel: 'çevrim', left: ro, pad: { l: 40, r: 12 }, series: [], refLines: [] });
+    const cS = new LineChart($('chCycS'), opts({ min: 0, max: 8, label: '%' })), cM = new LineChart($('chCycM'), opts({ min: 2.3, max: 3.0, label: 'V' }));
+    const mk = key => [{ key, rows: data.yes, color: cssv('--cv'), label: 'BMS var', width: 2 }, { key, rows: data.no, color: cssv('--fault'), label: 'BMS yok', width: 2 }];
+    cM.o.refLines = [{ axis: 'left', value: 2.5, color: cssv('--fault'), label: '2.50 V', right: true }];
+    let g = 0;
+    const draw = () => { cS.o.series = mk('spread'); cM.o.series = mk('minV'); cS.draw([{ n: 0 }], { xKey: 'n', xMin: 1, xMax: N }); cM.draw([{ n: 0 }], { xKey: 'n', xMin: 1, xMax: N }); };
+    const step = () => {
+      const t0 = performance.now();
+      while (g < 2 && performance.now() - t0 < 60) { const it = gens[g][1].next(); if (it.done) { g++; continue; }
+        const r = it.value; data[gens[g][0]].push({ n: r.n, spread: r.spreadFull * 100, minV: r.minCellV, wh: r.usedWh }); }
+      draw();
+      if (g < 2) return setTimeout(step, 0);
+      const y = data.yes, n = data.no, L = a => a[a.length - 1], under = n.filter(r => r.minV < 2.5).length, firstU = (n.find(r => r.minV < 2.5) || {}).n;
+      $('cycBox').innerHTML =
+        `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">BMS var · 30. çevrim</span><div class="big ok">%${fmt(L(y).spread, 2)}</div><p>hücre farkı; enerji ${fmt(y[0].wh, 1)} → ${fmt(L(y).wh, 1)} Wh, en düşük hücre ${fmt(Math.min(...y.map(r => r.minV)), 2)} V</p></div>` +
+        `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">BMS yok · 30. çevrim</span><div class="big bad">%${fmt(L(n).spread, 2)}</div><p>hücre farkı; enerji ${fmt(n[0].wh, 1)} → ${fmt(L(n).wh, 1)} Wh (−%${fmt((1 - L(n).wh / n[0].wh) * 100, 1)})</p></div>` +
+        `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">BMS yok · aşırı deşarj</span><div class="big bad">${under} / ${N}</div><p>çevrimde bir hücre 2.5 V'un altına indi${firstU ? ` (ilk: ${firstU}. çevrim)` : ''}; cihazın 9.0 V paket kesmesi zayıf hücreyi görmüyor.</p></div>`;
+    };
+    setTimeout(step, 200);
+  })();
+  setTimeout(() => {
+    const imb = c => { c.cells[0].soc = .4; c.cells[1].soc = .25; c.cells[2].soc = .18; };
+    const C = Reconfig.runCycle(imb);
+    const B = ScenariosA.runScenario({ ...ScenariosA.SCENARIOS.find(x => x.id === 'capacity'), apply: imb }, 'improved');
+    const bs = B.s.history.find(h => h.state === 'CHARGE_DONE') || B.s.history[B.s.history.length - 1];
+    const socB = bs.soc.map(x => fmt(x * 100, 0)).join(' / '), socC = C.charged.finalSoc.map(x => fmt(Math.min(1, x) * 100, 0)).join(' / ');
+    $('altBox').innerHTML =
+      `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">Rev B · seri şarj + BMS balans</span><div class="big bad">${fmt(B.r.dischargedWh, 1)} Wh</div><p>Şarj sonrası SOC ${socB} %; kullanımı en az dolan hücre bitiriyor.</p></div>` +
+      `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">Matris · 1S3P şarj, 3S1P kullanım</span><div class="big ok">${fmt(C.used.stats.dischargedWh, 1)} Wh</div><p>Şarj sonrası SOC ${socC} %; paralele alma tepe akımı ${fmt(C.s.stats.peakParI, 2)} A.</p></div>` +
+      `<div><span class="eyebrow" style="font-size:11px;color:var(--ink-3)">Fark</span><div class="big">+%${fmt((C.used.stats.dischargedWh / B.r.dischargedWh - 1) * 100, 0)}</div><p>Dengesiz pakette kullanılabilir enerji artışı. Dengeli pakette fark yok (≈ 30 Wh).</p></div>`;
+  }, 50);
+  drawCell(); drawDsg(); drawCmp(); runAll();
+  window.addEventListener('resize', () => { drawCell(); drawDsg(); drawCmp(); });
+})();
+</script>
+</body>
+</html>
