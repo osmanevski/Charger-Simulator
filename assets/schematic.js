@@ -285,13 +285,20 @@
       T(510, 280, 'ARDUINO UNO · ATmega328P', 'blkname sm', 'middle') + pins +
       `<rect class="fsmchip" x="470" y="392" width="170" height="24" rx="2"/>` + T(555, 409, '—', 'fsm', 'middle', 'sFsm')));
     s.push(W([[510, 424], [510, GND]]) + dot(510, GND));
-    // Yardımcı besleme ve kullanıcı girişleri: ayrık ölçümde A5 serbesttir.
-    s.push(`<g>` +
-      T(195, 306, 'U6 · 7.5 V BUCK', 'ref') +
-      T(195, 324, 'V1+ → U6 → Uno Vin', 'val') +
-      T(195, 352, 'SW1: D12–GND', 'val') +
-      `<g data-meas="ina">${T(195, 370, 'RV2: 10k → A3', 'val')}</g><g data-meas="disc">${T(195, 370, 'RV2: 10k → A5', 'val')}</g>` +
-      T(195, 386, '(5 V / GND arası)', 'val') + `<g data-meas="ina">${T(195, 404, 'LCD1: I²C A4/A5', 'val')}</g>` + `</g>`);
+    // Aynı adaptörden ikinci güç kolu: V1+ → U6 → Arduino Vin.
+    // U1 GND hattının üzerinden köprüyle geçilir; burada elektriksel birleşim yoktur.
+    s.push(`<g id="auxSupply">` + dot(60, 242) +
+      W([[60, 242], [162, 242]]) + `<path class="w" d="M162 242 Q170 226 178 242"/>` +
+      W([[178, 242], [205, 242], [205, 350], [220, 350]]) +
+      block(220, 328, 120, 64, 'U6', 'Arduino besleme buck', 'aux',
+        T(280, 353, 'BUCK', 'blkname', 'middle') +
+        T(280, 375, '19.5 → 7.5 V', 'val', 'middle')) +
+      W([[340, 350], [354, 350], [354, 246], [510, 246], [510, 262]]) +
+      T(420, 239, '7.5 V → Vin', 'probe', 'middle') +
+      W([[280, 392], [280, GND]]) + dot(280, GND) +
+      T(280, 318, 'ARDUINO BESLEMESİ', 'ref', 'middle') +
+      T(195, 467, 'SW1: D12 · şarj modu', 'val') +
+      `<g data-meas="ina">${T(410, 467, 'LCD1: I²C A4/A5', 'val')}</g>` + `</g>`);
 
     // Revizyon bulutları (yalnız Rev B)
     s.push(`<g class="clouds" data-rev="B">` + REVISIONS.filter(r => r.cloud !== false).map(r => cloud(...r.box, r.n)).join('') + `</g>`);

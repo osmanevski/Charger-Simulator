@@ -73,33 +73,24 @@ a { color: var(--a28); }
   gap: 10px;
 }
 /* Şarj paneli eklenince grafiklerin minimum yüksekliğini koru; sayfa kayabilir. */
-.chargeApp { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
+.chargeApp { grid-template-rows: auto auto minmax(0, 1fr) auto; }
 @media (min-height: 860px) and (min-width: 1180px) { .app:not(.chargeApp) { height: 100vh; } }
 
-/* Şarj paneli: tezgâhın akım/süre seçimi, simülasyon oynatma hızından ayrı. */
-.charge-controls { display: grid; grid-template-columns: minmax(360px, 1.35fr) minmax(210px, .7fr) minmax(280px, 1fr); gap: 22px; padding: 16px 18px; background: var(--sheet); border: 1px solid var(--rule); }
+/* Altı mod, doğrudan devre paftasının üst kenarında. */
+.schematic-panel { display: flex; flex-direction: column; min-width: 0; border: 1px solid var(--rule); background: var(--sheet); }
+.schematic-panel .sheet { flex: 1; border: 0; border-top: 1px solid var(--rule); border-radius: 0; }
+.charge-controls { padding: 12px 14px 9px; }
+.charge-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .charge-controls .eyebrow { font-size: 11px; }
-.adapter-label { color: var(--ink-2); font-weight: 400; letter-spacing: 0; margin-left: 12px; text-transform: none; }
-.charge-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 9px 0; }
-.charge-modes button { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 8px 10px; background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--rule); }
+.adapter-label { color: var(--ink-2); font-size: 11px; }
+.charge-modes { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; margin: 9px 0 7px; }
+.charge-modes button { display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 9px 5px; background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--rule); }
 .charge-modes button[aria-pressed="true"] { border-color: var(--a28); background: var(--a28-soft); }
 .charge-modes strong { font-family: var(--font-display); font-size: 14px; }
-.charge-modes span, .charge-modes small { font-size: 11px; white-space: nowrap; }
-.charge-modes small { color: var(--ink-2); }
-.charge-slider { display: flex; align-items: center; gap: 10px; font-size: 12px; }
-.charge-slider input { flex: 1; min-width: 50px; accent-color: var(--a28); }
-.charge-slider output { min-width: 108px; text-align: right; font-variant-numeric: tabular-nums; }
-.charge-estimate { display: flex; flex-direction: column; justify-content: center; gap: 6px; border-left: 1px solid var(--rule); padding-left: 22px; }
-.charge-estimate > strong { font: 650 26px/1.15 var(--font-display); }
-#chargeLimits { font-size: 12px; color: var(--ink-2); }
-.charge-estimate .hint { margin: 0; }
-.charge-deadline label { font-size: 13px; font-weight: 600; }
-.deadline-input { display: flex; gap: 8px; align-items: center; margin-top: 9px; }
-.deadline-input input { width: 72px; padding: 6px 8px; border: 1px solid var(--rule); background: var(--sheet); }
-.charge-deadline .hint, #chargePlanStatus { margin: 7px 0 0; font-size: 11px; }
-#chargePlanStatus { color: var(--ink); }
-@media (max-width: 1150px) { .charge-controls { grid-template-columns: minmax(330px, 1fr) minmax(210px, .7fr); } .charge-deadline { grid-column: 1 / -1; } }
-@media (max-width: 650px) { .charge-controls { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 12px; } .charge-estimate { border-left: 0; border-top: 1px solid var(--rule); padding: 12px 0 0; } .adapter-label { display: block; margin: 3px 0 0; } .charge-modes button { padding: 7px 5px; } .charge-slider { flex-wrap: wrap; } }
+.charge-modes span { font-size: 12px; white-space: nowrap; }
+.charge-modes small { font-size: 10px; color: var(--ink-2); }
+#chargeLimits { margin: 0; min-height: 18px; font-size: 11px; color: var(--ink-2); }
+@media (max-width: 650px) { .charge-modes { grid-template-columns: repeat(3, minmax(0, 1fr)); } .charge-controls { padding: 10px; } }
 
 /* Başlık */
 .top {

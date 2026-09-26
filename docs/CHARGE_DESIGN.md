@@ -2,7 +2,7 @@
 
 26.09.2026 · 3S1P ASPİLSAN INR18650A28 · Sony VGP-AC19V14
 
-Kullanıcı Yavaş **1,0 A**, SAFE **1,4 A**, Dengeli **2,1 A**, FAST **2,8 A**, BOOST **3,5 A**, MAX **≤4,0 A** seçer. Özel akım 0,1 A adımlarla 1–4 A aralığındadır. Açılış SAFE. Seri paketin nominal kapasitesi 2,8 Ah; aynı şarj akımı üç hücreden geçer. 4 A = 1,43C; 1,5C = 4,2 A bu tasarımın dışında kalır.
+Kullanıcı Yavaş **1,0 A**, SAFE **1,4 A**, Dengeli **2,1 A**, FAST **2,8 A**, BOOST **3,5 A**, MAX **≤4,0 A** seçer. Arayüzde yalnızca bu altı mod vardır; özel akım ve süre alanları kaldırılmıştır. Modlar şemanın üstünden seçilir. Açılış SAFE. Seri paketin nominal kapasitesi 2,8 Ah; aynı şarj akımı üç hücreden geçer. 4 A = 1,43C; 1,5C = 4,2 A bu tasarımın dışında kalır.
 
 **Uygulanan kapsam:** tarayıcı simülasyonu, kontrol modeli, şema, parametreler ve BOM. Depoda gerçek Arduino firmware’i veya üretime hazır PCB yoktur. Aşağıdaki pin bağlantıları fiziksel uygulama hedefini tanımlar; simülasyon fiziksel kabul testinin yerine geçmez.
 
@@ -62,11 +62,11 @@ Her hücrede TMP36 bulunur; CD4051 ile sırayla A0’dan okunur. Üç sensörün
 
 LCD I²C’ye geçtiği için D2–D4 sıcaklık çoklayıcısına ayrılabilir. Eski ayrık LM358 ölçümü karşılaştırma seçeneğidir; 2,8 A yazılım tavanıyla kalır ve ana BOM’a dahil değildir. Şemadaki sıcaklık bağlantıları X0–X2 net etiketleriyle gösterilir; sensör çıkışları birbirine bağlanmaz.
 
-Fiziksel arayüz hedefi: kısa basış modları/özel akımı seçer; A3 pot özel akımı ayarlar. Uzun basış süre ekranını açar; pot dakika, kısa basış onay. Tam fizik modeli Uno’ya sığdırılmak yerine ölçülmüş süre tabloları/SOC kestirimiyle ayrı firmware’e aktarılmalıdır.
+Fiziksel arayüz hedefi: D12 butonuyla altı hazır mod arasında geçiş. A3 pot bağlantısı önceki özel akım/süre tasarımının isteğe bağlı donanımıdır; güncel web arayüzünde kullanılmaz.
 
-## Süre seçimi
+## Süre hesabının kapsamı
 
-“En geç N dakika sonra bitsin”, mevcut durumdan kalan süreyi ifade eder. **31 aday akım**, canlı SOC, RC polarizasyonu, sıcaklık sensör gecikmeleri, PWM, BMS ve zamanlayıcı durumunun kopyasında denenir. Süreye yetişen en düşük akım seçilir. Hesap sırasında simülasyon durur; koşullar değişirse eski sonuç uygulanmaz. Hedef imkânsızsa ayar korunur. Soğukta BOOST/MAX SAFE akımına indiğinden MAX her koşulda en hızlı seçenek değildir; adayların süreleri ayrı ayrı denenir. Seçim SOC’u, geçen süreyi veya arıza durumunu sıfırlamaz. Tam belirlenen dakikaya kadar bekletme yapılmaz.
+Güncel kullanıcı arayüzünde süre girişi, özel akım kaydırıcısı veya hesaplama paneli yoktur. Altı hazır mod doğrudan şemanın üstünden seçilir. `charge-planner.js` içindeki 31 adaylı tahmin/süre hesabı, deney ve headless doğrulama aracı olarak korunmuştur; ana sayfada yüklenmez. Önceki deney sonuçları aynı fizik modeli için geçerlidir.
 
 **[Güncel deney tablosu ve 132 koşulun özeti](CHARGE_RESULTS.md)** · [ham veri](charge-sweep.json) · [parametreler](charge-config.json) · [malzeme listesi](BOM.md) · [BOM CSV](bom-revb.csv).
 

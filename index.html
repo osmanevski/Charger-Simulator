@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Şarj Tezgâhı — 3S A28</title>
-<link rel="stylesheet" href="assets/bench.css">
+<link rel="stylesheet" href="assets/bench.css?v=20260926-six-modes">
 </head>
 <body>
 <div class="app chargeApp revB" id="app">
@@ -48,28 +48,22 @@
     <div class="rd state" id="rStateBox"><span class="tag">Firmware durumu</span><div class="num" id="rState">—</div><div class="sub" id="rStates">—</div></div>
   </section>
 
-  <section class="charge-controls" aria-label="Şarj hızı ve süre seçimi">
-    <div class="charge-choice">
-      <div class="eyebrow">Şarj hızını seç <span class="adapter-label" id="chargeAdapterLabel">Sony · 19,5 V / 4,7 A</span></div>
-      <div class="charge-modes" id="chargeModes" role="group" aria-label="Şarj akımı modları"></div>
-      <label class="charge-slider" for="chargeAmps"><span>Özel akım</span><input id="chargeAmps" type="range" min="1" max="4" step="0.1" value="1.4"><output id="chargeAmpValue" for="chargeAmps">1,4 A · 0,50C</output></label>
-    </div>
-    <div class="charge-estimate">
-      <span class="eyebrow">Şarj sonuna tahmini kalan</span>
-      <strong id="chargeEta">Hesaplanıyor…</strong>
-      <span id="chargeLimits">CV, sıcaklık ve hücre farkı hesaba katılır.</span>
-      <span class="hint">Model tahmini · gerçek cihazda süre garantisi değildir.</span>
-    </div>
-    <div class="charge-deadline">
-      <label for="chargeMinutes">En geç kaç dakika sonra bitsin?</label>
-      <div class="deadline-input"><input id="chargeMinutes" type="number" min="1" max="300" step="1" value="90" inputmode="numeric"><span>dk</span><button class="btn" id="chargeByTime">Akımı hesapla</button></div>
-      <p class="hint">Hesaplarken simülasyon duraklar. Süreyi sağlayan en düşük akım seçilir; dolunca şarj biter.</p>
-      <p id="chargePlanStatus" role="status" aria-live="polite"></p>
-    </div>
-  </section>
-
   <main class="main">
-    <section class="sheet" id="sheet" aria-label="Devre şeması"></section>
+    <section class="schematic-panel" aria-label="Şarj modu ve devre şeması">
+      <div class="charge-controls">
+        <div class="charge-heading"><span class="eyebrow">Şarj modu</span><span class="adapter-label" id="chargeAdapterLabel">Sony · 19,5 V / 4,7 A</span></div>
+        <div class="charge-modes" id="chargeModes" role="group" aria-label="Şarj akımı modları">
+            <button data-charge="1" aria-pressed="false"><strong>Yavaş</strong><span>1,0 A</span><small>0,36C</small></button>
+            <button data-charge="1.4" aria-pressed="true"><strong>SAFE</strong><span>1,4 A</span><small>0,50C</small></button>
+            <button data-charge="2.1" aria-pressed="false"><strong>Dengeli</strong><span>2,1 A</span><small>0,75C</small></button>
+            <button data-charge="2.8" aria-pressed="false"><strong>FAST</strong><span>2,8 A</span><small>1,00C</small></button>
+            <button data-charge="3.5" aria-pressed="false"><strong>BOOST</strong><span>3,5 A</span><small>1,25C</small></button>
+            <button data-charge="4" aria-pressed="false"><strong>MAX</strong><span>≤4,0 A</span><small>1,43C</small></button>
+        </div>
+        <p id="chargeLimits" role="status">SAFE · 1,4 A</p>
+      </div>
+      <div class="sheet" id="sheet" aria-label="Devre şeması"></div>
+    </section>
 
     <section class="plots">
       <div class="plot dual">
@@ -154,15 +148,14 @@
   </section>
 </div>
 
-<script src="assets/a28-model.js"></script>
-<script src="assets/ina219-model.js"></script>
-<script src="assets/charger-a.js"></script>
-<script src="assets/charge-planner.js"></script>
-<script src="assets/charge-controls.js"></script>
-<script src="assets/scenarios-a.js"></script>
-<script src="assets/charts.js"></script>
-<script src="assets/schematic.js"></script>
-<script src="assets/bom.js"></script>
-<script src="assets/bench.js"></script>
+<script src="assets/a28-model.js?v=20260926-six-modes"></script>
+<script src="assets/ina219-model.js?v=20260926-six-modes"></script>
+<script src="assets/charger-a.js?v=20260926-six-modes"></script>
+<script src="assets/charge-controls.js?v=20260926-six-modes"></script>
+<script src="assets/scenarios-a.js?v=20260926-six-modes"></script>
+<script src="assets/charts.js?v=20260926-six-modes"></script>
+<script src="assets/schematic.js?v=20260926-six-modes"></script>
+<script src="assets/bom.js?v=20260926-six-modes"></script>
+<script src="assets/bench.js?v=20260926-six-modes"></script>
 </body>
 </html>

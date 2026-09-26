@@ -12,9 +12,9 @@
 
 ## Sunum kısayolları (index.html)
 
-**Şarj hızı ve süre:** Üst panelden Yavaş (1.0 A), SAFE (1.4 A), Dengeli (2.1 A), FAST (2.8 A), BOOST (3.5 A), MAX (≤4.0 A) veya 0.1 A adımlarla özel akım seçilir. Şarj sırasında değiştirilebilir; SOC, geçen süre ve koruma durumları sıfırlanmaz. **300× gibi oynatma hızları şarj akımını değiştirmez.**
+**Şarj modu:** Şemanın hemen üzerindeki altı düğmeden Yavaş (1.0 A), SAFE (1.4 A), Dengeli (2.1 A), FAST (2.8 A), BOOST (3.5 A), MAX (≤4.0 A) seçilir. Özel akım kaydırıcısı ve süre girişi kaldırılmıştır. Şarj sırasında seçim değiştirilebilir; SOC, geçen süre ve koruma durumları sıfırlanmaz. **300× gibi oynatma hızları şarj akımını değiştirmez.**
 
-"En geç kaç dakika sonra bitsin?" alanı, mevcut durumun kopyasında 1.0–4.0 A arasındaki 31 akımı dener. Süreyi sağlayan en düşük akımı seçer; imkânsız hedefte ayarı korur. Hesap sırasında simülasyon duraklar; Devam ile sürdürülür. Süre şarj sonuna kadardır, tam olarak o dakikaya kadar bekletme değildir. CV, sıcaklık, donanım sınırı, hücre farkı ve mevcut 240 dk zamanlayıcısı hesaba katılır. Dengesiz pakette "şarj tamam" bütün hücrelerin %100 olduğu anlamına gelmez.
+Şemada adaptör iki kola ayrılır: U1 XL4015 → pil şarj devresi; U6 buck (19.5 → 7.5 V) → Arduino Vin. U6 tıklanınca bağlantı ve besleme açıklaması açılır. İkinci adaptör gerekmez.
 
 Varsayılan kaynak **Sony VGP-AC19V14, 19.5 V / 4.7 A**; XL4015 CC tavanı **3.90 A nominal**, doğrulanacak +%2 hata bütçesiyle **3.978 A**. Varsayılan ölçüm **INA219 + R050 ≥2 W**, sıcaklık **3×TMP36 + CD4051**; LCD I²C, ayar potu A3. [Deney sonuçları ve güncel donanım tasarımı](docs/CHARGE_DESIGN.md).
 
@@ -38,7 +38,7 @@ assets/a28-model.js     A28 hücre modeli (1RC Thevenin + termal), datasheet sab
 assets/ina219-model.js  INA219 yazmaç ölçekleri, CAL, taşma, şönt/ölçüm hataları
 assets/charger-a.js     Sistem modeli: adaptör, XL4015, ölçüm zinciri, firmware durum makinesi, BMS
 assets/charge-planner.js Canlı durumdan şarj süresi tahmini ve süreye uygun akım seçimi
-assets/charge-controls.js Şarj hızı, özel akım ve süre paneli
+assets/charge-controls.js Şemanın üstündeki altı mod seçimi
 assets/scenarios-a.js   Senaryo ve ablasyon tanımları (sayfalar ve testler ortak kullanır)
 assets/reconfig-model.js  Alternatif mimari modeli (MOSFET matrisi, 1S3P/3S1P)
 assets/schematic-c.js   Alternatif mimari paftası

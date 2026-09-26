@@ -142,6 +142,10 @@
   const PARTS = {
     adapter: () => ({ t: 'Adaptör', r: 'V1', d: 'Sistemi besleyen DC adaptör. XL4015\'in 12.6 V çıkış verebilmesi için giriş, çıkışın ve yol düşümlerinin üstünde olmalı.',
       kv: [['Gerilim', `${cfg.adapterV} V`], ['Durum', cfg.adapterOn ? 'bağlı' : 'çıkarıldı']], f: ['adapterOn', 'adapterV'] }),
+    aux: () => ({ t: 'Arduino beslemesi', r: 'U6 · 19.5 V → 7.5 V buck',
+      d: 'Sony adaptörün çıkışı iki kola ayrılır: U1 XL4015 pil şarjını, U6 buck Arduino Vin girişini besler. Arduino beslemesi şarj akımı ve CV ayarından bağımsızdır.',
+      why: 'İkinci adaptör gerekmez. U6 en az 24 V giriş dayanımlı ve 0.5 A çıkışlı seçilir; GND ortaktır. 19.5 V doğrudan Uno girişine verilmez.',
+      kv: [['Giriş', cfg.adapterOn ? `${cfg.adapterV} V` : 'kapalı'], ['Vin hedefi', cfg.adapterOn ? '7.5 V' : '0 V']], f: ['adapterOn'] }),
     xl: () => ({ t: 'XL4015 buck dönüştürücü', r: 'U1', d: 'FB pinini 1.25 V\'ta tutacak şekilde duty ayarlar (datasheet: 1.225–1.275 V, VFB = 0 V\'ta duty %100). Modülün CC potu donanım akım tavanıdır.',
       why: 'CV potunun yerine takılan sabit R_üst, çıkıştan FB\'ye geri beslemeyi korur: dönüştürücü kapalı çevrimde çalışır ve çıkış bölücünün belirlediği tavanı (12.60 V) geçemez.',
       whyA: 'Pot sökülünce FB yalnızca Arduino\'nun PWM gerilimini görür. 1.25 V\'un altında duty %100 (çıkış ≈ giriş), üstünde %0. Dönüştürücü açık çevrimde, iki konumlu çalışır.',
@@ -735,7 +739,6 @@
   // --- Başlat ------------------------------------------------------------------
   chargeControls = new window.ChargeControls({ getSystem: () => sys,
     onApply: amps => { sys.setChargeCurrent(amps); renderParams(); renderChecks(); },
-    onPause: () => { running = false; sys.log('Süre hesabı için duraklatıldı; Devam ile sürdürülür.'); },
   });
   SC.SCENARIOS.find(x => x.id === 'normal').apply(cfg);
   prog = newProg(SC.SCENARIOS.find(x => x.id === 'normal'));

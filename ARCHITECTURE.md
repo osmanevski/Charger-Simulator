@@ -55,7 +55,9 @@ Bitiş akımı 5 s üstel filtreyle süzülür; CV gerilim bölgesi ve 5 s onay 
 
 `charge-planner.js` canlı hücrelerin SOC, RC polarizasyonu, sıcaklık ve parametrelerini; PWM/RC, BMS, firmware ve zamanlayıcı durumlarını kopyalar. Aynı 50 ms fizik modeliyle bitişe ilerler; ADC gürültüsü sabit tohumlu yerel PRNG ile sürdürülür. Gürültüyü sıfırlamak, 16 örnek ortalamasının alt-LSB çözünürlüğünü kaybettirdiği için uygun değildir. Canlı sistemin RNG'si değiştirilmez.
 
-`charge-controls.js` hesaplamayı generator dilimleriyle yapar; ana arayüz yanıt verir, `file://` kullanımında worker veya sunucu gerekmez. Mevcut akım ve altı hazır mod için tahmin yenilenir; süre seçiminde 31 akım denenir. Süre, şarj bitişine kadar kalan tahmindir. Tamamlanmayan/arızalı aday seçilmez. Plan sırasında durum değişmişse sonuç uygulanmaz. Beş saat tahmin ufku, 240 dk şarj güvenlik zamanlayıcısını uzatmaz.
+`charge-controls.js` yalnızca şemanın üstündeki altı mod düğmesini yönetir. Kullanıcı arayüzünde özel akım, süre girişi veya tahmin paneli yoktur. `charge-planner.js` ana sayfada yüklenmez; Node deneyleri ve doğrulama testleri için korunur. HTML’de düğmeler başlangıçtan itibaren bulunur. Statik CSS/JS bağlantıları sürüm etiketi taşır; yayınlar arasında eski ve yeni dosyaların karışması önlenir.
+
+Şemada V1 adaptörün pozitif düğümünden U1 XL4015 ve U6 7.5 V buck kolları ayrılır. U6 çıkışı Uno Vin’e gider; GND dönüşü ortak raya bağlanır. U1 GND ile kesişen pozitif hat, birleşim olmadığını göstermek için tel köprüsüyle çizilir.
 
 Donanım değişiklikleri ve modelin sınırları: [Şarj tasarımı](docs/CHARGE_DESIGN.md).
 

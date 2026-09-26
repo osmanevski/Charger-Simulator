@@ -4,42 +4,35 @@ from pathlib import Path
 import json
 import os
 root = Path(__file__).resolve().parents[1]
+base = os.environ.get('SITE_URL')
+def url(name): return base.rstrip('/') + '/' + name if base else (root / name).as_uri()
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=True, **({'executable_path': os.environ['CHROMIUM_EXECUTABLE']} if os.environ.get('CHROMIUM_EXECUTABLE') else {}))
     page = browser.new_page(viewport={'width':1440,'height':1080}, device_scale_factor=1)
     errors=[]
     page.on('pageerror', lambda err: errors.append(str(err)))
-    page.goto((root / 'index.html').as_uri())
+    page.goto(url('index.html'))
     page.wait_for_load_state('networkidle')
     assert not errors, errors
-    page.wait_for_function("document.querySelector('#chargeEta').textContent.includes('dk')",timeout=30000)
-    print('Initial ETA',page.locator('#chargeEta').inner_text())
-    page.screenshot(path='/private/tmp/battery-charge-desktop.png',full_page=True)
     assert page.locator('[data-charge]').count() == 6
-    assert '0.05 Ω' in page.locator('#sInaShunt').text_content()
-    page.locator('[data-charge="4"]').click()
-    page.wait_for_function("document.querySelector('#chargeLimits').textContent.includes('3,90')")
-    page.locator('[data-charge="2.8"]').click()
-    page.wait_for_function("document.querySelector('[data-charge=\"2.8\"]').getAttribute('aria-pressed') === 'true'")
-    page.locator('#chargeMinutes').fill('65')
-    page.locator('#chargeByTime').click()
-    page.wait_for_function("document.querySelector('#chargePlanStatus').textContent.includes('seçildi')",timeout=60000)
-    print('Deadline',page.locator('#chargePlanStatus').inner_text())
-    page.wait_for_function("Number(document.querySelector('#chargeAmps').value) > 2.8")
-    assert float(page.locator('#chargeAmps').input_value()) > 2.8
-    page.locator('#chargeAmps').evaluate("el => { el.value = 3.7; el.dispatchEvent(new Event('change', {bubbles:true})); }")
-    page.wait_for_function("document.querySelector('#chargeAmpValue').textContent.includes('3,7')")
-    page.locator('#chargeMinutes').fill('1')
-    page.locator('#chargeByTime').click()
-    page.wait_for_function("document.querySelector('#chargePlanStatus').textContent.includes('yetişmiyor')",timeout=60000)
-    print('Impossible',page.locator('#chargePlanStatus').inner_text())
+    assert page.locator('#chargeAmps, #chargeMinutes, #chargeByTime, #chargeEta').count() == 0
+    assert page.locator('.schematic-panel #chargeModes').count() == 1
+    assert '19.5 → 7.5 V' in page.locator('#auxSupply').text_content()
+    assert '7.5 V → Vin' in page.locator('#auxSupply').text_content()
+    for amps in ['1', '1.4', '2.1', '2.8', '3.5', '4']:
+        page.locator(f'[data-charge="{amps}"]').click()
+        assert page.locator(f'[data-charge="{amps}"]').get_attribute('aria-pressed') == 'true'
+        assert page.locator('[data-charge][aria-pressed="true"]').count() == 1
+    assert '3,90' in page.locator('#chargeLimits').inner_text()
+    page.screenshot(path='/private/tmp/battery-charge-desktop.png',full_page=True)
+    page.locator('[data-part="aux"]').click()
+    assert 'İkinci adaptör gerekmez' in page.locator('#inspector').inner_text()
     page.locator('#play').click()
     page.wait_for_function("document.querySelector('#rt').textContent !== '00:00:00'")
     soc=page.locator('#rS').inner_text();t=page.locator('#rt').inner_text()
     page.locator('[data-charge="1.4"]').click()
     assert page.locator('#rt').inner_text() != '00:00:00'
     page.locator('#play').click()
-    page.wait_for_function("document.querySelector('#chargeEta').textContent.includes('dk')",timeout=30000)
     page.locator('[data-tab="bom"]').click()
     assert 'R050' in page.locator('[data-panel="bom"]').inner_text()
     assert 'LM358' not in page.locator('[data-panel="bom"]').inner_text()
@@ -60,10 +53,10 @@ with sync_playwright() as p:
     print('Live switch', t, soc, 'errors',errors)
     assert not errors, errors
     for name in ['alternatif.html', 'dogrulama.html']:
-        page.goto((root / name).as_uri())
+        page.goto(url(name))
         page.wait_for_load_state('networkidle')
         if name == 'dogrulama.html':
             assert page.locator('#chargeValidation tbody tr').count() == 6
     assert not errors, errors
-    print('PASS: six modes, MAX cap, custom current, deadline, fault latch, BOM, mobile and all pages')
+    print('PASS: six modes above schematic, no custom/time inputs, power split, live switching, fault latch, mobile and all pages')
     browser.close()
