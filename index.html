@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="assets/bench.css">
 </head>
 <body>
-<div class="app revB" id="app">
+<div class="app chargeApp revB" id="app">
 
   <header class="top">
     <div class="title">
@@ -46,6 +46,26 @@
     <div class="rd mid"><span class="tag">Ortalama SOC</span><div class="num" id="rS">—</div><div class="sub" id="rSs">—</div></div>
     <div class="rd mid"><span class="tag">Süre</span><div class="num" id="rt">—</div><div class="sub" id="rts">—</div></div>
     <div class="rd state" id="rStateBox"><span class="tag">Firmware durumu</span><div class="num" id="rState">—</div><div class="sub" id="rStates">—</div></div>
+  </section>
+
+  <section class="charge-controls" aria-label="Şarj hızı ve süre seçimi">
+    <div class="charge-choice">
+      <div class="eyebrow">Şarj hızını seç <span class="adapter-label" id="chargeAdapterLabel">Sony · 19,5 V / 4,7 A</span></div>
+      <div class="charge-modes" id="chargeModes" role="group" aria-label="Şarj akımı modları"></div>
+      <label class="charge-slider" for="chargeAmps"><span>Özel akım</span><input id="chargeAmps" type="range" min="1" max="4" step="0.1" value="1.4"><output id="chargeAmpValue" for="chargeAmps">1,4 A · 0,50C</output></label>
+    </div>
+    <div class="charge-estimate">
+      <span class="eyebrow">Şarj sonuna tahmini kalan</span>
+      <strong id="chargeEta">Hesaplanıyor…</strong>
+      <span id="chargeLimits">CV, sıcaklık ve hücre farkı hesaba katılır.</span>
+      <span class="hint">Model tahmini · gerçek cihazda süre garantisi değildir.</span>
+    </div>
+    <div class="charge-deadline">
+      <label for="chargeMinutes">En geç kaç dakika sonra bitsin?</label>
+      <div class="deadline-input"><input id="chargeMinutes" type="number" min="1" max="300" step="1" value="90" inputmode="numeric"><span>dk</span><button class="btn" id="chargeByTime">Akımı hesapla</button></div>
+      <p class="hint">Hesaplarken simülasyon duraklar. Süreyi sağlayan en düşük akım seçilir; dolunca şarj biter.</p>
+      <p id="chargePlanStatus" role="status" aria-live="polite"></p>
+    </div>
   </section>
 
   <main class="main">
@@ -101,7 +121,7 @@
       <div class="ard">
         <div>
           <div class="lcd" aria-label="LCD ekran"><div id="lcd1"></div><div id="lcd2"></div></div>
-          <p class="hint">16×2 paralel LCD (D2–D6, D8), firmware'in gösterdiği metin</p>
+          <p class="hint">16×2 I²C LCD (A4/A5), firmware'in gösterdiği metin</p>
         </div>
         <div><table id="measTable"></table></div>
         <div>
@@ -135,7 +155,10 @@
 </div>
 
 <script src="assets/a28-model.js"></script>
+<script src="assets/ina219-model.js"></script>
 <script src="assets/charger-a.js"></script>
+<script src="assets/charge-planner.js"></script>
+<script src="assets/charge-controls.js"></script>
 <script src="assets/scenarios-a.js"></script>
 <script src="assets/charts.js"></script>
 <script src="assets/schematic.js"></script>

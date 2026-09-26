@@ -12,6 +12,12 @@
 
 ## Sunum kısayolları (index.html)
 
+**Şarj hızı ve süre:** Üst panelden Yavaş (1.0 A), SAFE (1.4 A), Dengeli (2.1 A), FAST (2.8 A), BOOST (3.5 A), MAX (≤4.0 A) veya 0.1 A adımlarla özel akım seçilir. Şarj sırasında değiştirilebilir; SOC, geçen süre ve koruma durumları sıfırlanmaz. **300× gibi oynatma hızları şarj akımını değiştirmez.**
+
+"En geç kaç dakika sonra bitsin?" alanı, mevcut durumun kopyasında 1.0–4.0 A arasındaki 31 akımı dener. Süreyi sağlayan en düşük akımı seçer; imkânsız hedefte ayarı korur. Hesap sırasında simülasyon duraklar; Devam ile sürdürülür. Süre şarj sonuna kadardır, tam olarak o dakikaya kadar bekletme değildir. CV, sıcaklık, donanım sınırı, hücre farkı ve mevcut 240 dk zamanlayıcısı hesaba katılır. Dengesiz pakette "şarj tamam" bütün hücrelerin %100 olduğu anlamına gelmez.
+
+Varsayılan kaynak **Sony VGP-AC19V14, 19.5 V / 4.7 A**; XL4015 CC tavanı **3.90 A nominal**, doğrulanacak +%2 hata bütçesiyle **3.978 A**. Varsayılan ölçüm **INA219 + R050 ≥2 W**, sıcaklık **3×TMP36 + CD4051**; LCD I²C, ayar potu A3. [Deney sonuçları ve güncel donanım tasarımı](docs/CHARGE_DESIGN.md).
+
 | Tuş | İşlev |
 |---|---|
 | `Boşluk` | Başlat / duraklat |
@@ -29,7 +35,10 @@
 
 ```
 assets/a28-model.js     A28 hücre modeli (1RC Thevenin + termal), datasheet sabitleri, sayısallaştırılmış şarj eğrisi
+assets/ina219-model.js  INA219 yazmaç ölçekleri, CAL, taşma, şönt/ölçüm hataları
 assets/charger-a.js     Sistem modeli: adaptör, XL4015, ölçüm zinciri, firmware durum makinesi, BMS
+assets/charge-planner.js Canlı durumdan şarj süresi tahmini ve süreye uygun akım seçimi
+assets/charge-controls.js Şarj hızı, özel akım ve süre paneli
 assets/scenarios-a.js   Senaryo ve ablasyon tanımları (sayfalar ve testler ortak kullanır)
 assets/reconfig-model.js  Alternatif mimari modeli (MOSFET matrisi, 1S3P/3S1P)
 assets/schematic-c.js   Alternatif mimari paftası
@@ -39,10 +48,20 @@ assets/schematic.js     Devre şeması (IEC sembolleri, pafta, antet, revizyon b
 assets/bench.js         Şarj tezgâhı arayüzü
 assets/charts.js        Grafik çizici
 assets/bench.css        Tasarım tokenları ve stiller
-tests/run-tests.js      38 regresyon testi:  node tests/run-tests.js
+tests/run-tests.js      62 regresyon testi:  node tests/run-tests.js
+tests/ina219.test.js    12 ölçüm / yüksek akım / sıcaklık / sayısal yakınsama testi
+tests/charge-planner.test.js Canlı seçim / CV / tahmin / süre hedefi testleri
+tests/sweep-charge.js   132 koşullu şarj taraması → docs/charge-sweep.json
 ```
 
 Model dosyaları (`a28-model.js`, `charger-a.js`, `scenarios-a.js`) hem tarayıcıda hem Node'da çalışır.
+
+Kontroller: `node tests/run-tests.js`, `node tests/ina219.test.js` ve `node tests/charge-planner.test.js`.
+Tarama: `node tests/sweep-charge.js > docs/charge-sweep.json`; ardından `node scripts/export-charge-design.js`.
+
+[Deney tablosu](docs/CHARGE_RESULTS.md) · [BOM](docs/BOM.md) · [CSV](docs/bom-revb.csv) · [Parametreler](docs/charge-config.json).
+
+25 °C, %20 başlangıç için yaklaşık süreler: **143 / 108 / 80 / 67 / 60 / 57 dakika**. Değerler model tahmini; 35 °C üzerinde termal azaltma, soğuk hücrede BOOST/MAX sınırı ve CV kuyruğu süreyi değiştirir. Bitiş, filtrelenmiş 140 mA + gerilim koşulu + 5 s onay ile belirlenir. Gerçek Arduino firmware’i ve PCB bu depoda bulunmaz; güncelleme simülasyon ve elektriksel tasarıma uygulanmıştır.
 
 ## Önemli
 

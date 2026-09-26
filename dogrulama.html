@@ -113,6 +113,13 @@
   </section>
 
   <section class="page">
+    <h2>Altı kademeli şarj — deney sonuçları</h2>
+    <p class="lead">25 °C, %20 başlangıç; INA219/R050 ve üç sıcaklık sensörü. Süreler model tahminidir. MAX isteği ≤4 A, nominal donanım tavanı 3.90 A. <a href="docs/CHARGE_DESIGN.md">Tasarım ve kabul koşulları</a> · <a href="docs/CHARGE_RESULTS.md">132 koşullu rapor</a> · <a href="docs/BOM.md">BOM</a>.</p>
+    <table id="chargeValidation"><thead><tr><th>Mod</th><th>İstek</th><th>Süre</th><th>Tepe sıcaklık</th><th>Tepe akım</th></tr></thead><tbody></tbody></table>
+    <p class="lead">Bu tablo <code>tests/sweep-charge.js</code> ve <code>scripts/export-charge-design.js</code> çıktısıdır. Soğuk/sıcak ortam, yanlış R100, kopuk INA219 ve dengesiz paket deneylerinde koruma duruşları da raporlanır. Bütün koşullarda şarj tamamlandı iddiası yoktur.</p>
+  </section>
+
+  <section class="page">
     <h2>Model varsayımları ve sınırlar</h2>
     <ul class="assume">
       <li><b>Hücre:</b> 1RC Thevenin (R0 30 mΩ, R1 20 mΩ, τ 45 s), 2.83 Ah. R0+R1, datasheet'teki CV akım sönüm süresine (1.4 → 0.14 A ≈ 16.5 dk) oturuyor. Datasheet ACIR ≤ 20 mΩ (1 kHz); DC direnç tipik olarak 1.5–2.5 katıdır.</li>
@@ -120,17 +127,20 @@
       <li><b>Sıcaklık:</b> hücre başına 44.5 J/K ve 15 K/W. 1C'de datasheet ile uyumlu (≈ +6 K); 2C üstünde ısınmayı olduğundan fazla gösterir.</li>
       <li><b>XL4015:</b> ortalama model (datasheet: V_FB 1.225–1.275 V, VFB = 0 V'ta duty %100, min. düşüm 0.3 V). Anahtarlama dalgalanması yok. PWM arabirimi TI SLVA861 Denk. 3: Vout = V_tavan − R_üst·max(0, V_PWM − V_D − 1.25)/(R4 + R3); CV potu yerine sabit R_üst: V_tavan = V_FB·(1 + R_üst/R_alt), R_alt 1 kΩ, R_üst ölçülerek 12.60 V'a düzeltilmiş (ayarsızken V_FB ±%2 → 12.37–12.88 V); R3 5.1 kΩ, R4 1 kΩ, D1 1N4148.</li>
       <li><b>BMS:</b> tipik 3S balanslı kart (OVP 4.25 V / 1 s, bırakma 4.15 V, UVP 2.50 V, ≥ 4.18 V'ta 60 mA balans). Kullanılan kartın kendi eşikleri girilmelidir.</li>
-      <li><b>Ölçüm:</b> 10-bit ADC, referans 5 V hattı, ±0.5 LSB gürültü, 16 örnek ortalama. Rev B: 0.1 Ω low-side şönt + LM358 ×10 (3 mV ofset, açılışta sıfırlanır), 10k/4.7k bölücü (%1.2 oran hatası), multimetreyle tek nokta kalibrasyon (kalan %0.1). Karşılaştırma için INA219: 4 mV / 0.1 mA LSB, %0.3 kazanç hatası.</li>
+      <li><b>Ölçüm:</b> Rev B: INA219 high-side R050 (≥2 W), ±320 mV, 16 V bus, CurrentLSB 200 µA, CAL4096. Şönt/bus kazanç, ofset, taşma ve bağlantı hataları modellenir. A1/A2: 10-bit ADC, ±0.5 LSB gürültü, 16 örnek. 3×TMP36 → CD4051 → A0; en sıcak/en soğuk hücre korunur. Ayrık LM358 ölçümü eski karşılaştırma seçeneğidir.</li>
+      <li><b>Yüksek akım:</b> altı kademe 1–≤4 A; nominal donanım tavanı 3.90 A, doğrulanacak +%2 bütçe ile 3.978 A. Modül ısısı ve anahtarlama ripple’ı modellenmez. Bitiş: 5 s filtreli akım ≤140 mA, CV gerilim bölgesi ve 5 s onay.</li>
       <li><b>Kapsam:</b> şarj 0–4 A, deşarj ≤ 3 A, −10…60 °C. Kontrol mantığı ve sistem davranışı simülasyonudur; SPICE analizi veya güvenlik sertifikasyonu yerine geçmez. Aynı kontroller: <code>node tests/run-tests.js</code></li>
     </ul>
   </section>
 </div>
 
 <script src="assets/a28-model.js"></script>
+<script src="assets/ina219-model.js"></script>
 <script src="assets/charger-a.js"></script>
 <script src="assets/scenarios-a.js"></script>
 <script src="assets/reconfig-model.js"></script>
 <script src="assets/charts.js"></script>
+<script src="assets/charge-results.js"></script>
 <script>
 (function () {
   'use strict';
@@ -139,6 +149,9 @@
   const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : '—';
   const icon = { ok: '✓', warn: '!', bad: '✕' };
   const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
+
+  $('chargeValidation').querySelector('tbody').innerHTML = ChargeResults.rows.map(r =>
+    `<tr><td>${r.name}</td><td>${r.amps === 4 ? '≤' : ''}${fmt(r.amps, 1)} A</td><td>${fmt(r.minutes, 1)} dk</td><td>${fmt(r.peakTemp, 1)} °C</td><td>${fmt(r.peakChargeA, 3)} A</td></tr>`).join('');
 
   // Model ↔ datasheet
   const ref = A28.runReferenceCharge({ soc0: 0.015 }), DS = A28.DATASHEET_CHARGE_05C;

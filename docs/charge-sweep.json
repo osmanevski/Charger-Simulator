@@ -1,0 +1,2515 @@
+{
+  "conditions": "19.5 V / 4.7 A; nominal CC ceiling 3.90 A, +2% budget 3.978 A; INA219 R050/CAL4096; 3 TMP36; dt 0.05 s; 16-sample ADC, seeded noise; realistic cell spread; measured CV/cell/thermal limits enabled",
+  "count": 132,
+  "violations": 0,
+  "results": [
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 10,
+      "amps": 1,
+      "minutes": 180.6999999997079,
+      "reason": null,
+      "peakTemp": 11.385510687319254,
+      "peakV": 4.19199687861427,
+      "peakChargeA": 1.00959711196832,
+      "maxShuntW": 0.050964316424738636,
+      "finalSoc": [
+        0.9689108878727721,
+        0.979444466918298,
+        0.9878347385627542
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 10,
+      "amps": 1.4,
+      "minutes": 137.7416666669997,
+      "reason": null,
+      "peakTemp": 12.636722236849478,
+      "peakV": 4.191908380689916,
+      "peakChargeA": 1.408478208689239,
+      "maxShuntW": 0.09919054321762237,
+      "finalSoc": [
+        0.9689698322069589,
+        0.9795463274869814,
+        0.9877752736872557
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 10,
+      "amps": 2.1,
+      "minutes": 103.80833333356489,
+      "reason": null,
+      "peakTemp": 15.506994607451583,
+      "peakV": 4.1921667974914865,
+      "peakChargeA": 2.107092176178438,
+      "maxShuntW": 0.22199187194561923,
+      "finalSoc": [
+        0.9690206962045548,
+        0.979752252275797,
+        0.9879251772621422
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 10,
+      "amps": 2.8,
+      "minutes": 87.2083333335045,
+      "reason": null,
+      "peakTemp": 18.870729143749575,
+      "peakV": 4.192040484938633,
+      "peakChargeA": 2.8051672054603665,
+      "maxShuntW": 0.39344815252951615,
+      "finalSoc": [
+        0.9686456695417419,
+        0.9796765558309896,
+        0.9877744371356003
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 10,
+      "amps": 3.5,
+      "minutes": 93.39166666686033,
+      "reason": null,
+      "peakTemp": 21.790128365699434,
+      "peakV": 4.192141356235996,
+      "peakChargeA": 3.502657678918215,
+      "maxShuntW": 0.613430540784237,
+      "finalSoc": [
+        0.9686432310836156,
+        0.979795298437769,
+        0.9878555526372089
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 10,
+      "amps": 4,
+      "minutes": 90.66666666685042,
+      "reason": null,
+      "peakTemp": 23.544484858257253,
+      "peakV": 4.192141057824877,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.9686527878198579,
+        0.979905050118621,
+        0.9878754711378727
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 10,
+      "amps": 1,
+      "minutes": 146.40000000020703,
+      "reason": null,
+      "peakTemp": 11.384676368944138,
+      "peakV": 4.191514765227223,
+      "peakChargeA": 1.00946271380937,
+      "maxShuntW": 0.050950748528568894,
+      "finalSoc": [
+        0.9718692180464483,
+        0.9781556136704753,
+        0.9862416065102404
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 10,
+      "amps": 1.4,
+      "minutes": 112.93333333359809,
+      "reason": null,
+      "peakTemp": 12.632090881450884,
+      "peakV": 4.191508814738554,
+      "peakChargeA": 1.4082735565102469,
+      "maxShuntW": 0.09916172049830098,
+      "finalSoc": [
+        0.972042342726537,
+        0.9783722814393514,
+        0.9864088824854663
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 10,
+      "amps": 2.1,
+      "minutes": 86.28333333350113,
+      "reason": null,
+      "peakTemp": 15.437176729695924,
+      "peakV": 4.19154456066697,
+      "peakChargeA": 2.106610008300365,
+      "maxShuntW": 0.22189028635356323,
+      "finalSoc": [
+        0.9717749141200971,
+        0.9783905265655841,
+        0.9863343496265814
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 10,
+      "amps": 2.8,
+      "minutes": 73.85000000012256,
+      "reason": null,
+      "peakTemp": 18.59698436091416,
+      "peakV": 4.191645118528231,
+      "peakChargeA": 2.8046142956328675,
+      "maxShuntW": 0.3932930673634123,
+      "finalSoc": [
+        0.9717375300599213,
+        0.9785577236101379,
+        0.9863867964169003
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 10,
+      "amps": 3.5,
+      "minutes": 82.42500000015376,
+      "reason": null,
+      "peakTemp": 20.38882629067441,
+      "peakV": 4.191668891837946,
+      "peakChargeA": 3.500807176573223,
+      "maxShuntW": 0.6127825443773292,
+      "finalSoc": [
+        0.9716239065468856,
+        0.9785983935411877,
+        0.9863559944490674
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 10,
+      "amps": 4,
+      "minutes": 80.41666666681313,
+      "reason": null,
+      "peakTemp": 21.598623599999794,
+      "peakV": 4.191771933315445,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.9715978531158461,
+        0.9785908927213389,
+        0.9863804636642309
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 10,
+      "amps": 1,
+      "minutes": 97.8916666668767,
+      "reason": null,
+      "peakTemp": 11.376518822668922,
+      "peakV": 4.191809474652546,
+      "peakChargeA": 1.0089868324774518,
+      "maxShuntW": 0.05090272140564407,
+      "finalSoc": [
+        0.9790567197644406,
+        0.9800844267303879,
+        0.9868592716161948
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 10,
+      "amps": 1.4,
+      "minutes": 78.51666666680622,
+      "reason": null,
+      "peakTemp": 12.549636968022254,
+      "peakV": 4.191540272538636,
+      "peakChargeA": 1.4073886829246502,
+      "maxShuntW": 0.0990371452412191,
+      "finalSoc": [
+        0.9789409844513872,
+        0.9800507519449554,
+        0.9867980224346079
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 10,
+      "amps": 2.1,
+      "minutes": 64.23333333342092,
+      "reason": null,
+      "peakTemp": 14.8485478859288,
+      "peakV": 4.191609851767598,
+      "peakChargeA": 2.1050616283429604,
+      "maxShuntW": 0.22156422295609582,
+      "finalSoc": [
+        0.978949079646083,
+        0.9802262423090272,
+        0.9868118097164363
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 10,
+      "amps": 2.8,
+      "minutes": 57.80833333339754,
+      "reason": null,
+      "peakTemp": 16.975498898483323,
+      "peakV": 4.191580147539136,
+      "peakChargeA": 2.802520488863432,
+      "maxShuntW": 0.3927060545249665,
+      "finalSoc": [
+        0.9788505515002558,
+        0.9802207976645266,
+        0.9867640933238824
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 10,
+      "amps": 3.5,
+      "minutes": 71.21666666677966,
+      "reason": null,
+      "peakTemp": 14.68789015061614,
+      "peakV": 4.1910808003538,
+      "peakChargeA": 3.4098468043466448,
+      "maxShuntW": 0.5813527614556513,
+      "finalSoc": [
+        0.9789326141067553,
+        0.9801584936627149,
+        0.9867892370177408
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 10,
+      "amps": 4,
+      "minutes": 71.12500000011265,
+      "reason": null,
+      "peakTemp": 14.717105834887183,
+      "peakV": 4.191419792627297,
+      "peakChargeA": 3.484903837496641,
+      "maxShuntW": 0.6072277378299408,
+      "finalSoc": [
+        0.9789211831959388,
+        0.9801469122669215,
+        0.9867974844440339
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 173.041666666486,
+      "reason": null,
+      "peakTemp": 25.9687447857832,
+      "peakV": 4.191059863859123,
+      "peakChargeA": 1.0169976591198289,
+      "maxShuntW": 0.05171421193276058,
+      "finalSoc": [
+        0.9659217589956498,
+        0.9795123429977781,
+        0.9887889030703285
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 129.47500000032494,
+      "reason": null,
+      "peakTemp": 26.856156649209314,
+      "peakV": 4.192613259041084,
+      "peakChargeA": 1.4156677293074045,
+      "maxShuntW": 0.10020575599011915,
+      "finalSoc": [
+        0.9664728820117966,
+        0.9796516076479904,
+        0.9890404166675758
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 94.25833333353015,
+      "reason": null,
+      "peakTemp": 28.94649346456517,
+      "peakV": 4.192610552532012,
+      "peakChargeA": 2.113683648587768,
+      "maxShuntW": 0.22338292831536496,
+      "finalSoc": [
+        0.9663216897113963,
+        0.9796667886051353,
+        0.9890421658006663
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 77.41666666680221,
+      "reason": null,
+      "peakTemp": 31.48622359696272,
+      "peakV": 4.192669184528669,
+      "peakChargeA": 2.81137521445811,
+      "maxShuntW": 0.39519152982346917,
+      "finalSoc": [
+        0.9662033507758949,
+        0.9796882079239492,
+        0.9890240034120433
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 67.80833333343392,
+      "reason": null,
+      "peakTemp": 34.22856140941751,
+      "peakV": 4.192595660289155,
+      "peakChargeA": 3.5095105834682294,
+      "maxShuntW": 0.6158332267737756,
+      "finalSoc": [
+        0.9663367068776749,
+        0.9798888656542055,
+        0.9891731785776023
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 63.75000000008583,
+      "reason": null,
+      "peakTemp": 35.48056684302805,
+      "peakV": 4.192544506343851,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.9660290611120013,
+        0.9796348623491347,
+        0.9890188117954609
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 142.5166666669302,
+      "reason": null,
+      "peakTemp": 25.968207772569077,
+      "peakV": 4.1920265696405705,
+      "peakChargeA": 1.016847161271922,
+      "maxShuntW": 0.05169890746933832,
+      "finalSoc": [
+        0.9725829913979952,
+        0.9813946111950039,
+        0.989481452449694
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 107.80000000024607,
+      "reason": null,
+      "peakTemp": 26.853452203436603,
+      "peakV": 4.191934504028299,
+      "peakChargeA": 1.4155083042732681,
+      "maxShuntW": 0.10018318797332915,
+      "finalSoc": [
+        0.9725203005679477,
+        0.9814164443046415,
+        0.9894357341685319
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 80.45833333347994,
+      "reason": null,
+      "peakTemp": 28.900791765019427,
+      "peakV": 4.191944465530367,
+      "peakChargeA": 2.11334362842456,
+      "maxShuntW": 0.22331106459013422,
+      "finalSoc": [
+        0.9725265905167697,
+        0.9815691989879491,
+        0.989478266411374
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 67.3333333334322,
+      "reason": null,
+      "peakTemp": 31.298834567665487,
+      "peakV": 4.192032590431912,
+      "peakChargeA": 2.810769313491852,
+      "maxShuntW": 0.3950212066833729,
+      "finalSoc": [
+        0.9724265547189784,
+        0.9816072294529344,
+        0.9894913350443698
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 60.15000000007273,
+      "reason": null,
+      "peakTemp": 33.78613908418317,
+      "peakV": 4.192240467487709,
+      "peakChargeA": 3.5088313335693058,
+      "maxShuntW": 0.6155948663718878,
+      "finalSoc": [
+        0.9726475446826751,
+        0.9819166350328163,
+        0.9896673696904195
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 56.80000000006054,
+      "reason": null,
+      "peakTemp": 35.23467134142254,
+      "peakV": 4.192031507461392,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.972421921072822,
+        0.9818293785291377,
+        0.9895574755085474
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 92.48333333352369,
+      "reason": null,
+      "peakTemp": 25.963638285671664,
+      "peakV": 4.1913700654987025,
+      "peakChargeA": 1.0162839906294217,
+      "maxShuntW": 0.05164165748048312,
+      "finalSoc": [
+        0.9801930192147534,
+        0.9826276633249461,
+        0.9890234755207927
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 72.23333333345002,
+      "reason": null,
+      "peakTemp": 26.80626895394721,
+      "peakV": 4.191473464720459,
+      "peakChargeA": 1.414630193471681,
+      "maxShuntW": 0.10005892921408628,
+      "finalSoc": [
+        0.9801435753449845,
+        0.9827074538433674,
+        0.9890460477446685
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 56.55000000005963,
+      "reason": null,
+      "peakTemp": 28.537330011300313,
+      "peakV": 4.191501107181261,
+      "peakChargeA": 2.1116758495455836,
+      "maxShuntW": 0.22295874467770316,
+      "finalSoc": [
+        0.9799753845577819,
+        0.9825761627689971,
+        0.9889342983042633
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 49.5666666667009,
+      "reason": null,
+      "peakTemp": 30.260733546707513,
+      "peakV": 4.191506289695437,
+      "peakChargeA": 2.8085697321310676,
+      "maxShuntW": 0.3944031970121389,
+      "finalSoc": [
+        0.9799393584082224,
+        0.9826444200886201,
+        0.9889928909678751
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 46.15833333335516,
+      "reason": null,
+      "peakTemp": 31.791620757016112,
+      "peakV": 4.191562394468818,
+      "peakChargeA": 3.5059586997744,
+      "maxShuntW": 0.6145873202261901,
+      "finalSoc": [
+        0.9801474895556066,
+        0.9829068326374695,
+        0.9891637887898114
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 44.741666666683344,
+      "reason": null,
+      "peakTemp": 32.56734814117619,
+      "peakV": 4.191547623088878,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.9802096476048286,
+        0.9828990978177728,
+        0.989166587818761
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 35,
+      "amps": 1,
+      "minutes": 186.51666666628992,
+      "reason": null,
+      "peakTemp": 35.63232725523665,
+      "peakV": 4.1902140256265294,
+      "peakChargeA": 0.9809728129544437,
+      "maxShuntW": 0.048115382987787704,
+      "finalSoc": [
+        0.9666949803272908,
+        0.9808111102718761,
+        0.9906695322497848
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 35,
+      "amps": 1.4,
+      "minutes": 143.8166666669113,
+      "reason": null,
+      "peakTemp": 36.10165713579365,
+      "peakV": 4.192687126083392,
+      "peakChargeA": 1.3599044028547647,
+      "maxShuntW": 0.09246699924518871,
+      "finalSoc": [
+        0.9676429319283258,
+        0.9813941363793895,
+        0.991099730493155
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 35,
+      "amps": 2.1,
+      "minutes": 109.48333333358553,
+      "reason": null,
+      "peakTemp": 36.96463351199021,
+      "peakV": 4.192728118248191,
+      "peakChargeA": 2.016398210925582,
+      "maxShuntW": 0.2032930872511944,
+      "finalSoc": [
+        0.9670033772634238,
+        0.9808044831023713,
+        0.9907225102521146
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 35,
+      "amps": 2.8,
+      "minutes": 94.23333333353006,
+      "reason": null,
+      "peakTemp": 37.75872457132087,
+      "peakV": 4.192849909583014,
+      "peakChargeA": 2.6729852336207602,
+      "maxShuntW": 0.3572425029577315,
+      "finalSoc": [
+        0.9673001046966289,
+        0.9811057730869037,
+        0.990921236468007
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 35,
+      "amps": 3.5,
+      "minutes": 85.09166666683014,
+      "reason": null,
+      "peakTemp": 38.44335055966048,
+      "peakV": 4.1928390220587595,
+      "peakChargeA": 3.334684079425548,
+      "maxShuntW": 0.5560058954787108,
+      "finalSoc": [
+        0.966984355578257,
+        0.9808192016508873,
+        0.9907237191200999
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.01,
+      "ambientC": 35,
+      "amps": 4,
+      "minutes": 78.40000000013912,
+      "reason": null,
+      "peakTemp": 38.86884449531771,
+      "peakV": 4.1929090831144284,
+      "peakChargeA": 3.819130290662731,
+      "maxShuntW": 0.7292878088528799,
+      "finalSoc": [
+        0.9646061759657378,
+        0.9784247825454557,
+        0.9891723435952391
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 35,
+      "amps": 1,
+      "minutes": 149.43333333349622,
+      "reason": null,
+      "peakTemp": 35.63231608887737,
+      "peakV": 4.190270041080166,
+      "peakChargeA": 0.9884608527678694,
+      "maxShuntW": 0.048852742872729185,
+      "finalSoc": [
+        0.9699528429238908,
+        0.9805850800352914,
+        0.9891245278212005
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 35,
+      "amps": 1.4,
+      "minutes": 118.3416666669511,
+      "reason": null,
+      "peakTemp": 36.10087549812104,
+      "peakV": 4.192352004244881,
+      "peakChargeA": 1.37254851210185,
+      "maxShuntW": 0.09419447090365012,
+      "finalSoc": [
+        0.9735023359085566,
+        0.9833346502658997,
+        0.9912797877627778
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 35,
+      "amps": 2.1,
+      "minutes": 87.99166666684069,
+      "reason": null,
+      "peakTemp": 36.963599835781146,
+      "peakV": 4.192303727205815,
+      "peakChargeA": 2.041969391920399,
+      "maxShuntW": 0.20848194987698823,
+      "finalSoc": [
+        0.9702484036720167,
+        0.9805039437841796,
+        0.9892504478104378
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 35,
+      "amps": 2.8,
+      "minutes": 76.15000000013093,
+      "reason": null,
+      "peakTemp": 37.75778697976809,
+      "peakV": 4.192291800429331,
+      "peakChargeA": 2.7154680355369076,
+      "maxShuntW": 0.36868833260113365,
+      "finalSoc": [
+        0.9708126683290769,
+        0.9810903729266933,
+        0.9896474821372121
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 35,
+      "amps": 3.5,
+      "minutes": 71.8250000001152,
+      "reason": null,
+      "peakTemp": 38.441394689898374,
+      "peakV": 4.192461538931202,
+      "peakChargeA": 3.3965676123412925,
+      "maxShuntW": 0.5768335772602915,
+      "finalSoc": [
+        0.9732082948546176,
+        0.9832057069180247,
+        0.9911581933916039
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.2,
+      "ambientC": 35,
+      "amps": 4,
+      "minutes": 68.58333333343674,
+      "reason": null,
+      "peakTemp": 38.86778787937287,
+      "peakV": 4.192373025372082,
+      "peakChargeA": 3.8698700856797745,
+      "maxShuntW": 0.7487947240019593,
+      "finalSoc": [
+        0.9732967786086436,
+        0.9833278417378831,
+        0.9912172946625446
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 35,
+      "amps": 1,
+      "minutes": 97.10833333354051,
+      "reason": null,
+      "peakTemp": 35.63110498308909,
+      "peakV": 4.1916691376413775,
+      "peakChargeA": 0.9886998073276935,
+      "maxShuntW": 0.04887636545049091,
+      "finalSoc": [
+        0.9810418373826122,
+        0.9840581580551785,
+        0.9906065297349405
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 35,
+      "amps": 1.4,
+      "minutes": 76.20833333346448,
+      "reason": null,
+      "peakTemp": 36.09598371257074,
+      "peakV": 4.1915566468748935,
+      "peakChargeA": 1.3712280558712935,
+      "maxShuntW": 0.09401331906042837,
+      "finalSoc": [
+        0.9810533862352936,
+        0.9840801733549727,
+        0.9905891118655306
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 35,
+      "amps": 2.1,
+      "minutes": 60.60000000007437,
+      "reason": null,
+      "peakTemp": 36.941724347760136,
+      "peakV": 4.191601672630823,
+      "peakChargeA": 2.043269051586966,
+      "maxShuntW": 0.20874742085865494,
+      "finalSoc": [
+        0.9812775397314801,
+        0.9843204360537722,
+        0.9907233596424839
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 35,
+      "amps": 2.8,
+      "minutes": 53.30833333338117,
+      "reason": null,
+      "peakTemp": 37.71672188891441,
+      "peakV": 4.19158693659939,
+      "peakChargeA": 2.7177939414342753,
+      "maxShuntW": 0.3693201954048427,
+      "finalSoc": [
+        0.9813944135586417,
+        0.9843819906421339,
+        0.990835169339847
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 35,
+      "amps": 3.5,
+      "minutes": 48.94166666669862,
+      "reason": null,
+      "peakTemp": 38.38922486006103,
+      "peakV": 4.191690150862226,
+      "peakChargeA": 3.394494715564981,
+      "maxShuntW": 0.5761297186999291,
+      "finalSoc": [
+        0.9811360432108915,
+        0.9842847173670767,
+        0.9907085346998955
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "balanced",
+      "startSoc": 0.5,
+      "ambientC": 35,
+      "amps": 4,
+      "minutes": 46.95833333335807,
+      "reason": null,
+      "peakTemp": 38.81174576745311,
+      "peakV": 4.191689466073568,
+      "peakChargeA": 3.8765995622890075,
+      "maxShuntW": 0.7514012083169663,
+      "finalSoc": [
+        0.9809971866108779,
+        0.9842171121600091,
+        0.9905733414541698
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "aged",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 129.19166666699056,
+      "reason": null,
+      "peakTemp": 26.01003343729397,
+      "peakV": 4.192121866204398,
+      "peakChargeA": 1.0141590785039434,
+      "maxShuntW": 0.05142593182559838,
+      "finalSoc": [
+        0.8773328818473651,
+        0.8873457786830818,
+        0.9867640634197536
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "aged",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 98.50000000021224,
+      "reason": null,
+      "peakTemp": 26.93430448907908,
+      "peakV": 4.192544322267834,
+      "peakChargeA": 1.4128702959464305,
+      "maxShuntW": 0.0998101236583877,
+      "finalSoc": [
+        0.8777517522441923,
+        0.8877772014422977,
+        0.9862967151464647
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "aged",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 73.53333333345475,
+      "reason": null,
+      "peakTemp": 29.083222701968943,
+      "peakV": 4.192234088150046,
+      "peakChargeA": 2.1104212052364257,
+      "maxShuntW": 0.2226938831755784,
+      "finalSoc": [
+        0.877949691835844,
+        0.8879832353853142,
+        0.9857353081337753
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "aged",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 62.108333333413185,
+      "reason": null,
+      "peakTemp": 31.636394401724388,
+      "peakV": 4.192180617883418,
+      "peakChargeA": 2.8082798092773547,
+      "maxShuntW": 0.3943217743597428,
+      "finalSoc": [
+        0.8786419269018455,
+        0.8886880924051194,
+        0.9859419319919466
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "aged",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 58.01666666673164,
+      "reason": null,
+      "peakTemp": 34.349813125500084,
+      "peakV": 4.191560209109608,
+      "peakChargeA": 3.506289184980636,
+      "maxShuntW": 0.6147031924356087,
+      "finalSoc": [
+        0.8815732898354547,
+        0.8916637504638752,
+        0.9879564099969494
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "aged",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 51.52500000004135,
+      "reason": null,
+      "peakTemp": 35.60829599999391,
+      "peakV": 4.191754572188383,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.8781972294373745,
+        0.8882389910246137,
+        0.9856420462149275
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "imbalance",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 113.72500000026763,
+      "reason": null,
+      "peakTemp": 25.967531705916688,
+      "peakV": 4.189218344191105,
+      "peakChargeA": 1.0168405661128486,
+      "maxShuntW": 0.05169823684463492,
+      "finalSoc": [
+        0.9895606528045643,
+        0.8557175007710605,
+        0.7952289642668349
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "imbalance",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 87.72500000017304,
+      "reason": null,
+      "peakTemp": 26.84303285959609,
+      "peakV": 4.1892436448083785,
+      "peakChargeA": 1.4154054132097225,
+      "maxShuntW": 0.10016862418716926,
+      "finalSoc": [
+        0.9898308536878287,
+        0.8571076047801458,
+        0.7966359073192855
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "imbalance",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 66.08333333342765,
+      "reason": null,
+      "peakTemp": 28.804815006628267,
+      "peakV": 4.189092375216086,
+      "peakChargeA": 2.112356370062803,
+      "maxShuntW": 0.22310247170724515,
+      "finalSoc": [
+        0.9896399396290229,
+        0.8577262053195135,
+        0.7972600877217099
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "imbalance",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 55.92500000005736,
+      "reason": null,
+      "peakTemp": 31.013000271934118,
+      "peakV": 4.189324944937891,
+      "peakChargeA": 2.809816806890202,
+      "maxShuntW": 0.39475352441413253,
+      "finalSoc": [
+        0.9897323006593093,
+        0.8583628067719262,
+        0.7979047328490099
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "imbalance",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 49.90000000003544,
+      "reason": null,
+      "peakTemp": 33.25550303121511,
+      "peakV": 4.188913690572078,
+      "peakChargeA": 3.5075029785685703,
+      "maxShuntW": 0.6151288572333696,
+      "finalSoc": [
+        0.989786472820927,
+        0.85866610911959,
+        0.7982116423478357
+      ],
+      "balanced": false,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "imbalance",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": null,
+      "reason": "OV_FAULT",
+      "peakTemp": 34.61102580688233,
+      "peakV": 4.202110805772614,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.8505359285103294,
+        0.7075453285915181,
+        0.6447174978506717
+      ],
+      "balanced": false,
+      "state": "OV_FAULT"
+    },
+    {
+      "scenario": "hot",
+      "startSoc": 0.2,
+      "ambientC": 38,
+      "amps": 1,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 44.602971864126246,
+      "peakV": 3.567624127545621,
+      "peakChargeA": 0.6664766487733583,
+      "maxShuntW": 0.02220955616800832,
+      "finalSoc": [
+        0.24837671524638746,
+        0.24908777653652417,
+        0.24986234794570797
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot",
+      "startSoc": 0.2,
+      "ambientC": 38,
+      "amps": 1.4,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 44.63767069713962,
+      "peakV": 3.580670760157548,
+      "peakChargeA": 0.9338841497803869,
+      "maxShuntW": 0.04360698026055181,
+      "finalSoc": [
+        0.26797390990996467,
+        0.26897544579389243,
+        0.2700615999468471
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot",
+      "startSoc": 0.2,
+      "ambientC": 38,
+      "amps": 2.1,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 44.625815692944435,
+      "peakV": 3.5992202068815837,
+      "peakChargeA": 1.4109207780137294,
+      "maxShuntW": 0.09953487209154338,
+      "finalSoc": [
+        0.29705958128805726,
+        0.2984925269133547,
+        0.3000408583346648
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot",
+      "startSoc": 0.2,
+      "ambientC": 38,
+      "amps": 2.8,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 44.56888723409165,
+      "peakV": 3.6160540733065476,
+      "peakChargeA": 1.8681777410915292,
+      "maxShuntW": 0.17450440361549246,
+      "finalSoc": [
+        0.31940610066070063,
+        0.32117074573976767,
+        0.32307394440635834
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot",
+      "startSoc": 0.2,
+      "ambientC": 38,
+      "amps": 3.5,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 44.612441378537326,
+      "peakV": 3.6319610510412046,
+      "peakChargeA": 2.3357872258814476,
+      "maxShuntW": 0.27279509822954745,
+      "finalSoc": [
+        0.3407501781623648,
+        0.3428314368847036,
+        0.345073770051662
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot",
+      "startSoc": 0.2,
+      "ambientC": 38,
+      "amps": 4,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 44.59335747771892,
+      "peakV": 3.639921559539261,
+      "peakChargeA": 2.657931542183203,
+      "maxShuntW": 0.353230004146619,
+      "finalSoc": [
+        0.3507032765919736,
+        0.3529323727051036,
+        0.35533267357503784
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "cold-5",
+      "startSoc": 0.2,
+      "ambientC": 5,
+      "amps": 1,
+      "minutes": 151.7000000001299,
+      "reason": null,
+      "peakTemp": 6.5589890232704375,
+      "peakV": 4.191792815740359,
+      "peakChargeA": 1.0071743757346747,
+      "maxShuntW": 0.05072001115682659,
+      "finalSoc": [
+        0.9748278398703716,
+        0.9790157165362914,
+        0.9868931561102335
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cold-5",
+      "startSoc": 0.2,
+      "ambientC": 5,
+      "amps": 1.4,
+      "minutes": 115.90000000027554,
+      "reason": null,
+      "peakTemp": 7.953976932240837,
+      "peakV": 4.191386756812807,
+      "peakChargeA": 1.4059446858244171,
+      "maxShuntW": 0.09883402297989596,
+      "finalSoc": [
+        0.97246889908135,
+        0.9775162555008824,
+        0.9854677876837759
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cold-5",
+      "startSoc": 0.2,
+      "ambientC": 5,
+      "amps": 2.1,
+      "minutes": 92.51666666685715,
+      "reason": null,
+      "peakTemp": 11.056408554918617,
+      "peakV": 4.1918332372250005,
+      "peakChargeA": 2.1041191473849397,
+      "maxShuntW": 0.22136586931959626,
+      "finalSoc": [
+        0.9747524238588804,
+        0.9792722933144323,
+        0.9869883556152669
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cold-5",
+      "startSoc": 0.2,
+      "ambientC": 5,
+      "amps": 2.8,
+      "minutes": 76.5250000001323,
+      "reason": null,
+      "peakTemp": 14.489016906430138,
+      "peakV": 4.191369340346846,
+      "peakChargeA": 2.8021499895673494,
+      "maxShuntW": 0.39260222820161483,
+      "finalSoc": [
+        0.9713607865100707,
+        0.9771130181870692,
+        0.9849627512620716
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cold-5",
+      "startSoc": 0.2,
+      "ambientC": 5,
+      "amps": 3.5,
+      "minutes": 115.90000000027554,
+      "reason": null,
+      "peakTemp": 7.953976932240837,
+      "peakV": 4.191386756812807,
+      "peakChargeA": 1.4059446858244171,
+      "maxShuntW": 0.09883402297989596,
+      "finalSoc": [
+        0.97246889908135,
+        0.9775162555008824,
+        0.9854677876837759
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cold-5",
+      "startSoc": 0.2,
+      "ambientC": 5,
+      "amps": 4,
+      "minutes": 115.90000000027554,
+      "reason": null,
+      "peakTemp": 7.953976932240837,
+      "peakV": 4.191386756812807,
+      "peakChargeA": 1.4059446858244171,
+      "maxShuntW": 0.09883402297989596,
+      "finalSoc": [
+        0.97246889908135,
+        0.9775162555008824,
+        0.9854677876837759
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cold-inhibit",
+      "startSoc": 0.2,
+      "ambientC": -5,
+      "amps": 1,
+      "minutes": null,
+      "reason": "Soğuk: şarj bekliyor",
+      "peakTemp": -4.999999999999956,
+      "peakV": 3.530461537840913,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "LOW_TEMP"
+    },
+    {
+      "scenario": "cold-inhibit",
+      "startSoc": 0.2,
+      "ambientC": -5,
+      "amps": 1.4,
+      "minutes": null,
+      "reason": "Soğuk: şarj bekliyor",
+      "peakTemp": -4.999999999999956,
+      "peakV": 3.530461537840913,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "LOW_TEMP"
+    },
+    {
+      "scenario": "cold-inhibit",
+      "startSoc": 0.2,
+      "ambientC": -5,
+      "amps": 2.1,
+      "minutes": null,
+      "reason": "Soğuk: şarj bekliyor",
+      "peakTemp": -4.999999999999956,
+      "peakV": 3.530461537840913,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "LOW_TEMP"
+    },
+    {
+      "scenario": "cold-inhibit",
+      "startSoc": 0.2,
+      "ambientC": -5,
+      "amps": 2.8,
+      "minutes": null,
+      "reason": "Soğuk: şarj bekliyor",
+      "peakTemp": -4.999999999999956,
+      "peakV": 3.530461537840913,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "LOW_TEMP"
+    },
+    {
+      "scenario": "cold-inhibit",
+      "startSoc": 0.2,
+      "ambientC": -5,
+      "amps": 3.5,
+      "minutes": null,
+      "reason": "Soğuk: şarj bekliyor",
+      "peakTemp": -4.999999999999956,
+      "peakV": 3.530461537840913,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "LOW_TEMP"
+    },
+    {
+      "scenario": "cold-inhibit",
+      "startSoc": 0.2,
+      "ambientC": -5,
+      "amps": 4,
+      "minutes": null,
+      "reason": "Soğuk: şarj bekliyor",
+      "peakTemp": -4.999999999999956,
+      "peakV": 3.530461537840913,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "LOW_TEMP"
+    },
+    {
+      "scenario": "high-rate-boundary",
+      "startSoc": 0.2,
+      "ambientC": 12,
+      "amps": 1,
+      "minutes": 146.05000000021212,
+      "reason": null,
+      "peakTemp": 13.320461744683012,
+      "peakV": 4.191625318170942,
+      "peakChargeA": 1.0104875100395574,
+      "maxShuntW": 0.05105425039729723,
+      "finalSoc": [
+        0.9721894200505068,
+        0.9788358703913942,
+        0.9868751023954486
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "high-rate-boundary",
+      "startSoc": 0.2,
+      "ambientC": 12,
+      "amps": 1.4,
+      "minutes": 111.85833333359417,
+      "reason": null,
+      "peakTemp": 14.512665615929594,
+      "peakV": 4.191655169150336,
+      "peakChargeA": 1.4090334171852876,
+      "maxShuntW": 0.09926875853724244,
+      "finalSoc": [
+        0.9718767096946598,
+        0.978690213829481,
+        0.9867382676045652
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "high-rate-boundary",
+      "startSoc": 0.2,
+      "ambientC": 12,
+      "amps": 2.1,
+      "minutes": 85.37500000016449,
+      "reason": null,
+      "peakTemp": 17.20549677336767,
+      "peakV": 4.19166375274684,
+      "peakChargeA": 2.107150850557837,
+      "maxShuntW": 0.2220042353503308,
+      "finalSoc": [
+        0.9719056877657605,
+        0.9789172037686454,
+        0.986848471186849
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "high-rate-boundary",
+      "startSoc": 0.2,
+      "ambientC": 12,
+      "amps": 2.8,
+      "minutes": 72.9250000001192,
+      "reason": null,
+      "peakTemp": 20.256606782351078,
+      "peakV": 4.191741443392303,
+      "peakChargeA": 2.8051703425941468,
+      "maxShuntW": 0.3934490325484882,
+      "finalSoc": [
+        0.9718786225640524,
+        0.9790897969935146,
+        0.986886367846954
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "high-rate-boundary",
+      "startSoc": 0.2,
+      "ambientC": 12,
+      "amps": 3.5,
+      "minutes": 65.74166666675974,
+      "reason": null,
+      "peakTemp": 23.282112851392256,
+      "peakV": 4.191834092033633,
+      "peakChargeA": 3.5036570936811016,
+      "maxShuntW": 0.6137806515050952,
+      "finalSoc": [
+        0.97185765968773,
+        0.9792301482932563,
+        0.9869495666267181
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "high-rate-boundary",
+      "startSoc": 0.2,
+      "ambientC": 12,
+      "amps": 4,
+      "minutes": 62.87500000008264,
+      "reason": null,
+      "peakTemp": 24.98652860609851,
+      "peakV": 4.19185103327794,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.9718533433457828,
+        0.9793303320811036,
+        0.9869609542383567
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "hot-inhibit",
+      "startSoc": 0.2,
+      "ambientC": 45,
+      "amps": 1,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 45,
+      "peakV": 3.530461538034146,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot-inhibit",
+      "startSoc": 0.2,
+      "ambientC": 45,
+      "amps": 1.4,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 45,
+      "peakV": 3.530461538034146,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot-inhibit",
+      "startSoc": 0.2,
+      "ambientC": 45,
+      "amps": 2.1,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 45,
+      "peakV": 3.530461538034146,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot-inhibit",
+      "startSoc": 0.2,
+      "ambientC": 45,
+      "amps": 2.8,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 45,
+      "peakV": 3.530461538034146,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot-inhibit",
+      "startSoc": 0.2,
+      "ambientC": 45,
+      "amps": 3.5,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 45,
+      "peakV": 3.530461538034146,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "hot-inhibit",
+      "startSoc": 0.2,
+      "ambientC": 45,
+      "amps": 4,
+      "minutes": null,
+      "reason": "Sıcaklık koruması: bekliyor",
+      "peakTemp": 45,
+      "peakV": 3.530461538034146,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "TEMP_FAULT"
+    },
+    {
+      "scenario": "cc-upper-budget",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 142.5166666669302,
+      "reason": null,
+      "peakTemp": 25.968207772569077,
+      "peakV": 4.1920265696405705,
+      "peakChargeA": 1.016847161271922,
+      "maxShuntW": 0.05169890746933832,
+      "finalSoc": [
+        0.9725829913979952,
+        0.9813946111950039,
+        0.989481452449694
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cc-upper-budget",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 107.80000000024607,
+      "reason": null,
+      "peakTemp": 26.853452203436603,
+      "peakV": 4.191934504028299,
+      "peakChargeA": 1.4155083042732681,
+      "maxShuntW": 0.10018318797332915,
+      "finalSoc": [
+        0.9725203005679477,
+        0.9814164443046415,
+        0.9894357341685319
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cc-upper-budget",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 80.45833333347994,
+      "reason": null,
+      "peakTemp": 28.900791765019427,
+      "peakV": 4.191944465530367,
+      "peakChargeA": 2.11334362842456,
+      "maxShuntW": 0.22331106459013422,
+      "finalSoc": [
+        0.9725265905167697,
+        0.9815691989879491,
+        0.989478266411374
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cc-upper-budget",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 67.3333333334322,
+      "reason": null,
+      "peakTemp": 31.298834567665487,
+      "peakV": 4.192032590431912,
+      "peakChargeA": 2.810769313491852,
+      "maxShuntW": 0.3950212066833729,
+      "finalSoc": [
+        0.9724265547189784,
+        0.9816072294529344,
+        0.9894913350443698
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cc-upper-budget",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 60.15000000007273,
+      "reason": null,
+      "peakTemp": 33.78613908418317,
+      "peakV": 4.192240467487709,
+      "peakChargeA": 3.5088313335693058,
+      "maxShuntW": 0.6155948663718878,
+      "finalSoc": [
+        0.9726475446826751,
+        0.9819166350328163,
+        0.9896673696904195
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "cc-upper-budget",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 56.600000000059815,
+      "reason": null,
+      "peakTemp": 35.31901205725138,
+      "peakV": 4.192094218561481,
+      "peakChargeA": 3.9779999999999998,
+      "maxShuntW": 0.7912241999999999,
+      "finalSoc": [
+        0.972488783554933,
+        0.9818901029491127,
+        0.989584518633092
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 140.20000000029725,
+      "reason": null,
+      "peakTemp": 26.006109418157482,
+      "peakV": 4.192043156640769,
+      "peakChargeA": 1.0368291549828956,
+      "maxShuntW": 0.053213227482816,
+      "finalSoc": [
+        0.972636633896662,
+        0.9814871725208998,
+        0.989481560605443
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 105.9833333335728,
+      "reason": null,
+      "peakTemp": 26.922511470873626,
+      "peakV": 4.192042069560562,
+      "peakChargeA": 1.442905645847174,
+      "maxShuntW": 0.1030578467894737,
+      "finalSoc": [
+        0.9723727226322648,
+        0.9813127660703991,
+        0.9893449556131207
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 79.51666666680985,
+      "reason": null,
+      "peakTemp": 29.031537324833163,
+      "peakV": 4.192007725087561,
+      "peakChargeA": 2.1533411529783195,
+      "maxShuntW": 0.22952546699494494,
+      "finalSoc": [
+        0.9726503994867829,
+        0.9816932451084291,
+        0.9895734282744599
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 66.59166666676283,
+      "reason": null,
+      "peakTemp": 31.486242694088325,
+      "peakV": 4.192123856735967,
+      "peakChargeA": 2.8634900668467846,
+      "maxShuntW": 0.40587898046504506,
+      "finalSoc": [
+        0.9724137134245507,
+        0.981630502159691,
+        0.9894759907255608
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 59.11666666673564,
+      "reason": null,
+      "peakTemp": 34.018741817570316,
+      "peakV": 4.192105519480322,
+      "peakChargeA": 3.5741217956279,
+      "maxShuntW": 0.632330157194129,
+      "finalSoc": [
+        0.9722410396192663,
+        0.9815987292133516,
+        0.9894104383436227
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 56.641666666726636,
+      "reason": null,
+      "peakTemp": 35.237912277544794,
+      "peakV": 4.192071300692441,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.752895,
+      "finalSoc": [
+        0.9722703187416157,
+        0.9817359131601807,
+        0.9894339895299668
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-overread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 144.32500000023722,
+      "reason": null,
+      "peakTemp": 25.94249452399546,
+      "peakV": 4.191724643052861,
+      "peakChargeA": 1.003160947390221,
+      "maxShuntW": 0.05081976026162671,
+      "finalSoc": [
+        0.972486964466248,
+        0.9814395987064553,
+        0.9894003431006635
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-overread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 109.0083333335838,
+      "reason": null,
+      "peakTemp": 26.807597600576674,
+      "peakV": 4.192000688895578,
+      "peakChargeA": 1.3971528419689505,
+      "maxShuntW": 0.09857782122300672,
+      "finalSoc": [
+        0.9725721915610335,
+        0.9814727386810204,
+        0.9894722023458596
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-overread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 81.45000000015021,
+      "reason": null,
+      "peakTemp": 28.81415062807304,
+      "peakV": 4.191994666844337,
+      "peakChargeA": 2.0868266052329543,
+      "maxShuntW": 0.21991968665555886,
+      "finalSoc": [
+        0.972770671849773,
+        0.9818157968788804,
+        0.9896336330551023
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-overread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 68.02500000010137,
+      "reason": null,
+      "peakTemp": 31.17478487800049,
+      "peakV": 4.192011994143942,
+      "peakChargeA": 2.7759729076254587,
+      "maxShuntW": 0.3891542919854625,
+      "finalSoc": [
+        0.9725835179897371,
+        0.9817442674094521,
+        0.9895948467480327
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-overread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 60.26666666673982,
+      "reason": null,
+      "peakTemp": 33.63124616251067,
+      "peakV": 4.19221827556626,
+      "peakChargeA": 3.4652407121911057,
+      "maxShuntW": 0.6063986062680494,
+      "finalSoc": [
+        0.972361380587096,
+        0.9816937270045858,
+        0.9894840809165047
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "sense-overread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 57.016666666728,
+      "reason": null,
+      "peakTemp": 35.23139587603277,
+      "peakV": 4.192033896421273,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.768105,
+      "finalSoc": [
+        0.9725367531154342,
+        0.9819309294113672,
+        0.9896215129194272
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "bus-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 146.47500000020594,
+      "reason": null,
+      "peakTemp": 25.968207772569077,
+      "peakV": 4.201178604599451,
+      "peakChargeA": 1.016847161271922,
+      "maxShuntW": 0.05169890746933832,
+      "finalSoc": [
+        0.9825578870323048,
+        0.9889644548956333,
+        1.0002700827511382
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "bus-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 111.6000000002599,
+      "reason": null,
+      "peakTemp": 26.853452203436603,
+      "peakV": 4.202146088003216,
+      "peakChargeA": 1.4155083042732681,
+      "maxShuntW": 0.10018318797332915,
+      "finalSoc": [
+        0.9824499172785923,
+        0.9888940614880315,
+        1.000124897962883
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "bus-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 84.63333333349513,
+      "reason": null,
+      "peakTemp": 28.900791765019427,
+      "peakV": 4.201473421102506,
+      "peakChargeA": 2.11334362842456,
+      "maxShuntW": 0.22331106459013422,
+      "finalSoc": [
+        0.9827612471492236,
+        0.9892212563258771,
+        1.0004008124562551
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "bus-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 71.9416666667823,
+      "reason": null,
+      "peakTemp": 31.298834567665487,
+      "peakV": 4.202032631718733,
+      "peakChargeA": 2.810769313491852,
+      "maxShuntW": 0.3950212066833729,
+      "finalSoc": [
+        0.9829577321669074,
+        0.9894564404067578,
+        1.000592966134098
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "bus-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": 64.075000000087,
+      "reason": null,
+      "peakTemp": 33.78613908418317,
+      "peakV": 4.201740066287781,
+      "peakChargeA": 3.5088313335693058,
+      "maxShuntW": 0.6155948663718878,
+      "finalSoc": [
+        0.9827434376917871,
+        0.9893687674624577,
+        1.0004669213451478
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "bus-underread",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": 61.12500000007628,
+      "reason": null,
+      "peakTemp": 35.23467134142254,
+      "peakV": 4.201741057711887,
+      "peakChargeA": 3.9,
+      "maxShuntW": 0.7605,
+      "finalSoc": [
+        0.9828244700514124,
+        0.989536162255644,
+        1.0006190816086762
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "wrong-r100",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": 144.4416666669022,
+      "reason": null,
+      "peakTemp": 25.960969535242246,
+      "peakV": 4.191408581697817,
+      "peakChargeA": 1.008021496077083,
+      "maxShuntW": 0.10161073365534808,
+      "finalSoc": [
+        0.9721497377572075,
+        0.981622585203865,
+        0.9897075990585339
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "wrong-r100",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": 110.40000000025553,
+      "reason": null,
+      "peakTemp": 26.843207597596727,
+      "peakV": 4.191528111522057,
+      "peakChargeA": 1.4066283315671035,
+      "maxShuntW": 0.19786032631672534,
+      "finalSoc": [
+        0.9720644566083808,
+        0.9815989459675817,
+        0.989691080367636
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "wrong-r100",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": 83.99166666682613,
+      "reason": null,
+      "peakTemp": 28.875195319966405,
+      "peakV": 4.191571552459543,
+      "peakChargeA": 2.1043471630435637,
+      "maxShuntW": 0.4428276982609496,
+      "finalSoc": [
+        0.9721497349893361,
+        0.9816586797449907,
+        0.9897998362324154
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "wrong-r100",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": 71.81666666678184,
+      "reason": null,
+      "peakTemp": 31.22004676784043,
+      "peakV": 4.191610383688392,
+      "peakChargeA": 2.801766551677109,
+      "maxShuntW": 0.7849895810096639,
+      "finalSoc": [
+        0.9721667531753394,
+        0.9817686948858744,
+        0.9898121578612624
+      ],
+      "balanced": true,
+      "state": "CHARGE_DONE"
+    },
+    {
+      "scenario": "wrong-r100",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.012843690879816,
+      "peakV": 3.63786630905184,
+      "peakChargeA": 3.2342845390036215,
+      "maxShuntW": 1.046059647923787,
+      "finalSoc": [
+        0.20065929041430164,
+        0.20066903674685915,
+        0.20067954238384064
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    },
+    {
+      "scenario": "wrong-r100",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.007782772565637,
+      "peakV": 3.6370162742946484,
+      "peakChargeA": 3.2487381968117366,
+      "maxShuntW": 1.0554299871423574,
+      "finalSoc": [
+        0.20041284348395777,
+        0.20041894208496752,
+        0.2004255247058749
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    },
+    {
+      "scenario": "ina-disconnected",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.000000000000036,
+      "peakV": 3.53046153798381,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    },
+    {
+      "scenario": "ina-disconnected",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 1.4,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.000000000000036,
+      "peakV": 3.53046153798381,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    },
+    {
+      "scenario": "ina-disconnected",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.1,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.000000000000036,
+      "peakV": 3.53046153798381,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    },
+    {
+      "scenario": "ina-disconnected",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 2.8,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.000000000000036,
+      "peakV": 3.53046153798381,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    },
+    {
+      "scenario": "ina-disconnected",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 3.5,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.000000000000036,
+      "peakV": 3.53046153798381,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    },
+    {
+      "scenario": "ina-disconnected",
+      "startSoc": 0.2,
+      "ambientC": 25,
+      "amps": 4,
+      "minutes": null,
+      "reason": "SENSOR_FAULT",
+      "peakTemp": 25.000000000000036,
+      "peakV": 3.53046153798381,
+      "peakChargeA": 0,
+      "maxShuntW": 0,
+      "finalSoc": [
+        0.19999999574935656,
+        0.19999999396383927,
+        0.19999999545260172
+      ],
+      "balanced": false,
+      "state": "SENSOR_FAULT"
+    }
+  ]
+}

@@ -103,6 +103,7 @@
 
   // --- Revizyon listesi (Rev B'de değişenler) ---------------------------------
   const REVISIONS = [
+    { n: 2, cloud: false, title: 'Seçilebilir şarj hızı ve Sony adaptör', box: [40, 230, 220, 80], part: 'adapter', text: '19.5 V / 4.7 A Sony; CC nominal 3.90 A, doğrulanacak +%2 üst sınır 3.978 A. Altı kademe 1.0–≤4.0 A. INA219 + R050 ≥2 W; 3×TMP36 + CD4051. A3 pot, D12 buton; Uno Vin için 7.5 V buck.' },
     { n: 1, cloud: false, title: 'XL4015 geri beslemesi: CV potu yerine sabit bölücü + diyotlu PWM enjeksiyonu', box: [250, 108, 196, 72], part: 'inject', text: 'CV potu yerine sabit R_üst (tavan 12.60 V, ölçülüp düzeltilir); PWM, R4-C1 + 1N4148 + R3 ile FB\'ye (TI SLVA861)' },
   ];
 
@@ -162,7 +163,7 @@
       `<rect class="hit" x="36" y="240" width="90" height="80"/>` +
       W([[60, 256], [60, TOP], [110, TOP]]) + `<circle class="sym" cx="60" cy="280" r="24"/>` +
       T(60, 276, '+', 'pm', 'middle') + T(60, 294, '−', 'pm', 'middle') + W([[60, 304], [60, GND]]) +
-      T(92, 276, 'V1', 'ref') + T(92, 292, '15 V', 'val', 'start', 'sAdapter') + `</g>`);
+      T(92, 276, 'V1 · SONY', 'ref') + T(92, 292, '19.5 V', 'val', 'start', 'sAdapter') + T(92, 306, '4.7 A', 'val') + `</g>`);
 
     // U1 XL4015
     s.push(block(110, 88, 120, 104, 'U1', 'XL4015', 'xl',
@@ -202,9 +203,9 @@
     // INA219 + şönt (Rev B) / düz hat (Rev A)
     s.push(`<g class="part" data-part="ina" tabindex="0" role="button" aria-label="Akım ölçümü">` +
       `<g data-rev="B" data-meas="disc">${W([[530, TOP], [690, TOP]])}</g>` +
-      `<g data-rev="B" data-meas="ina"><rect class="hit" x="540" y="34" width="165" height="104"/>${W([[530, TOP], [610, TOP]])}${resH(610, 690, TOP, 'R5', '0.1 Ω')}` +
+      `<g data-rev="B" data-meas="ina"><rect class="hit" x="540" y="34" width="165" height="104"/>${W([[530, TOP], [610, TOP]])}${resH(610, 690, TOP, 'R5', '')}${T(650, TOP + 26, '0.05 Ω / ≥2 W', 'val', 'middle', 'sInaShunt')}` +
       `<rect class="blk" x="606" y="38" width="88" height="42"/>${T(650, 56, 'INA219', 'blkname sm', 'middle')}${T(650, 72, '—', 'val', 'middle', 'sIna')}${T(612, 50, 'U3', 'ref')}` +
-      `${W([[626, 80], [626, TOP]], 'w thin')}${W([[674, 80], [674, TOP]], 'w thin')}${dot(626, TOP)}${dot(674, TOP)}` +
+      `${W([[626, 80], [610, 90], [610, TOP]], 'w thin')}${W([[674, 80], [690, 90], [690, TOP]], 'w thin')}${dot(610, TOP)}${dot(690, TOP)}` +
       `${W([[694, 52], [712, 52]], 'w thin')}${net(712, 52, 'SDA/SCL')}</g>` +
       `</g>`);
 
@@ -219,7 +220,7 @@
       `<rect class="hit" x="664" y="${TOP + 6}" width="72" height="180"/><rect class="hit" x="572" y="420" width="180" height="62"/>` +
       dot(700, TOP) + resV(700, TOP, 205, 'R6', '10k') + dot(700, 205) + W([[700, 205], [638, 205]]) + net(638, 205, 'A3', 'l') +
       resV(700, 205, 290, 'R7', '4.7k') + gnd(700, 298) +
-      resH(690, 740, GND, 'R5', '0.1 Ω') + dot(740, GND) +
+      resH(690, 740, GND, 'R5', '0.1 Ω / 3 W') + dot(740, GND) +
       W([[740, GND], [740, 456], [684, 456]]) +
       `<path class="sym" d="M684 448 L684 480 L656 464 Z"/>` + T(679, 461, '+', 'pm', 'middle') + T(679, 477, '−', 'pm', 'middle') +
       W([[684, 473], [694, 473]], 'w thin') + T(697, 477, '×10', 'val') +
@@ -242,11 +243,14 @@
     s.push(`<g data-rev="B" class="part" data-part="taps" tabindex="0" role="button" aria-label="Hücre izleme uçları">` +
       dot(895, 230) + W([[895, 230], [895, 244]], 'w thin') + net(895, 252, 'A2') +
       dot(895, 330) + W([[895, 330], [895, 344]], 'w thin') + net(895, 352, 'A1') + `</g>`);
-    // TMP36, H2 yüzeyinde (sağda)
-    s.push(`<g class="part" data-part="tmp" tabindex="0" role="button" aria-label="TMP36 sıcaklık sensörü">` +
-      `<rect class="hit" x="956" y="236" width="136" height="36"/>` +
-      `<rect class="blk" x="1038" y="240" width="52" height="30"/>${T(1064, 253, 'TMP36', 'pinl', 'middle')}${T(1064, 265, 'U5 · A0', 'val', 'middle')}` +
-      `<line class="thermal" x1="1038" y1="255" x2="962" y2="255"/>` + T(1064, 285, '—', 'probe', 'middle', 'sTmp') + `</g>`);
+    // Üç ayrı hücre sıcaklığı; analog çoklayıcı Uno A0'a gider.
+    s.push(`<g class="part" data-part="tmp" tabindex="0" role="button" aria-label="Üç TMP36 ve sıcaklık çoklayıcısı">` +
+      [175, 275, 375].map((y, i) => `<rect class="blk" x="1038" y="${y - 15}" width="52" height="30"/>` +
+        T(1064, y - 2, 'TMP36', 'pinl', 'middle') + T(1064, y + 10, 'U5' + ['C', 'B', 'A'][i], 'val', 'middle') +
+        `<line class="thermal" x1="1038" y1="${y}" x2="1023" y2="${y}"/>` +
+        T(1064, y + 26, '→ X' + (2 - i), 'val', 'middle')).join('') +
+      T(1064, 417, 'U7 CD4051', 'ref', 'middle') + T(1064, 433, 'D2–4 → A0', 'val', 'middle') +
+      T(1064, 453, '—', 'probe', 'middle', 'sTmp') + `</g>`);
 
     // Hücreler
     s.push(cellV(940, TOP, 230, 3) + cellV(940, 230, 330, 2) + cellV(940, 330, GND, 1));
@@ -275,12 +279,19 @@
     });
     unoPinsR.forEach((p, k) => {
       const y = 300 + k * 22;
-      pins += `<line class="stub" x1="640" y1="${y - 4}" x2="656" y2="${y - 4}"/>` + T(634, y, p[0], 'pinl', 'end') + T(588, y, p[1], 'val', 'end', p[2]);
+      pins += `<line class="stub" x1="640" y1="${y - 4}" x2="656" y2="${y - 4}"/>` + T(634, y, p[0], 'pinl', 'end', 'pl' + p[2]) + T(588, y, p[1], 'val', 'end', p[2]);
     });
     s.push(block(380, 262, 260, 162, 'U2', 'Arduino Uno', 'uno',
       T(510, 280, 'ARDUINO UNO · ATmega328P', 'blkname sm', 'middle') + pins +
       `<rect class="fsmchip" x="470" y="392" width="170" height="24" rx="2"/>` + T(555, 409, '—', 'fsm', 'middle', 'sFsm')));
     s.push(W([[510, 424], [510, GND]]) + dot(510, GND));
+    // Yardımcı besleme ve kullanıcı girişleri: ayrık ölçümde A5 serbesttir.
+    s.push(`<g>` +
+      T(195, 306, 'U6 · 7.5 V BUCK', 'ref') +
+      T(195, 324, 'V1+ → U6 → Uno Vin', 'val') +
+      T(195, 352, 'SW1: D12–GND', 'val') +
+      `<g data-meas="ina">${T(195, 370, 'RV2: 10k → A3', 'val')}</g><g data-meas="disc">${T(195, 370, 'RV2: 10k → A5', 'val')}</g>` +
+      T(195, 386, '(5 V / GND arası)', 'val') + `<g data-meas="ina">${T(195, 404, 'LCD1: I²C A4/A5', 'val')}</g>` + `</g>`);
 
     // Revizyon bulutları (yalnız Rev B)
     s.push(`<g class="clouds" data-rev="B">` + REVISIONS.filter(r => r.cloud !== false).map(r => cloud(...r.box, r.n)).join('') + `</g>`);

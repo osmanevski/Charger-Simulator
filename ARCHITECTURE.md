@@ -23,7 +23,7 @@ vb  = Σ (OCV + Vrc)          hücrelerin R0 arkasındaki gerilim
 rc  = Σ R0                   rext = R_hat + R_şönt
 i   = min( (Vset − vb)/(rext+rc),          XL4015 CV
            (Vin−0.4 − vb)/(rext+rc+0.15),  düşüm sınırı
-           I_CCpot )                        XL4015 CC
+           I_CCpot, I_adapter_power )       XL4015 CC ve adaptör gücü
 i   ≥ 0 (asenkron buck akım çekemez)
 ```
 
@@ -36,10 +36,28 @@ i   ≥ 0 (asenkron buck akım çekemez)
 
 ```
 CC_MODE ──(ölçülen V ≥ Vcv  veya  hücre ≥ 4.20 V)──► CV_MODE ──(I ≤ Icut, onay süresi)──► CHARGE_DONE
-Her durumda öncelik: SENSOR_FAULT > TEMP_FAULT (≥45 °C, <30 °C'de döner) > LOW_TEMP (<0 °C, ≥3 °C'de döner) > TIMEOUT
+Her durumda öncelik: SENSOR_FAULT > OC_FAULT > OV_FAULT > TEMP_FAULT (≥45 °C, <30 °C'de döner) > LOW_TEMP (<0 °C, ≥3 °C'de döner) > TIMEOUT
 ```
 
 Kontrol: tamsayı PWM üzerinde integral (artımlı) kontrolcü. `duty ↑ ⇒ Vout ↓`.
+
+CV aşamasında gerilim ve akım kontrol düzeltmelerinin çıkışı daha çok kısanı uygulanır. Böylece CV sırasında hız düşürme ve sıcaklığa bağlı akım azaltma da çalışır. `setChargeCurrent()` sadece hedefi değiştirir; hücreler, zamanlayıcılar ve kilitli arızalar korunur. Rev B kullanıcı tavanı 4.0 A, donanım CC nominal 3.90 A (+%2 kabul bütçesiyle 3.978 A); adaptör 19.5 V / 4.7 A, verim varsayımı %90.
+
+### Ölçüm ve bitiş
+
+`ina219-model.js`: R050 high-side; CAL4096, 200 µA CurrentLSB, ±320 mV/16 V ayarı. Gerçek şönt ile kalibrasyon şöntü ayrı parametrelerdir. Fiziksel şönt/kazanç/ofset/bus sapmaları, signed current-register taşması, 26 V giriş sınırı ve bağlantı kaybı hesaplanır. Hatalı veri `SENSOR_FAULT` kilidine gider; sıfır akım gibi değerlendirilip şarjı bitiremez. Röle ilk geçerli ölçüme kadar açık kalır.
+
+3×TMP36, 8 s sensör gecikmesi ve CD4051/A0 okuma modeli: maksimum sıcaklık azaltma/kesme, minimum sıcaklık soğuk kontrolü içindir. >2.8 A istek, üçlü ölçüm yoksa veya minimum <12 °C ise 1.4 A olur. I²C LCD A4/A5; pot A3; çoklayıcı seçimi D2–D4. Eski ayrık ölçüm 2.8 A ile sınırlıdır.
+
+Bitiş akımı 5 s üstel filtreyle süzülür; CV gerilim bölgesi ve 5 s onay birlikte aranır. Filtre durumu tahmin kopyasına dahildir. PWM kuantalaması nedeniyle CV kesme anı ve son SOC küçük miktarda değişebilir; bu davranış testte yavaş moda göre 0.5 yüzde puanlık SOC farkıyla sınanır. Tek hücre gerilim doğruluğu, INA bus ve Uno ADC fark ölçümünün toplam hatasına bağlıdır.
+
+### Şarj planlayıcısı
+
+`charge-planner.js` canlı hücrelerin SOC, RC polarizasyonu, sıcaklık ve parametrelerini; PWM/RC, BMS, firmware ve zamanlayıcı durumlarını kopyalar. Aynı 50 ms fizik modeliyle bitişe ilerler; ADC gürültüsü sabit tohumlu yerel PRNG ile sürdürülür. Gürültüyü sıfırlamak, 16 örnek ortalamasının alt-LSB çözünürlüğünü kaybettirdiği için uygun değildir. Canlı sistemin RNG'si değiştirilmez.
+
+`charge-controls.js` hesaplamayı generator dilimleriyle yapar; ana arayüz yanıt verir, `file://` kullanımında worker veya sunucu gerekmez. Mevcut akım ve altı hazır mod için tahmin yenilenir; süre seçiminde 31 akım denenir. Süre, şarj bitişine kadar kalan tahmindir. Tamamlanmayan/arızalı aday seçilmez. Plan sırasında durum değişmişse sonuç uygulanmaz. Beş saat tahmin ufku, 240 dk şarj güvenlik zamanlayıcısını uzatmaz.
+
+Donanım değişiklikleri ve modelin sınırları: [Şarj tasarımı](docs/CHARGE_DESIGN.md).
 
 ### Profiller
 

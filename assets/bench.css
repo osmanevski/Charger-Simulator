@@ -72,7 +72,34 @@ a { color: var(--a28); }
   padding: 0 18px 14px;
   gap: 10px;
 }
-@media (min-height: 860px) and (min-width: 1180px) { .app { height: 100vh; } }
+/* Şarj paneli eklenince grafiklerin minimum yüksekliğini koru; sayfa kayabilir. */
+.chargeApp { grid-template-rows: auto auto auto minmax(0, 1fr) auto; }
+@media (min-height: 860px) and (min-width: 1180px) { .app:not(.chargeApp) { height: 100vh; } }
+
+/* Şarj paneli: tezgâhın akım/süre seçimi, simülasyon oynatma hızından ayrı. */
+.charge-controls { display: grid; grid-template-columns: minmax(360px, 1.35fr) minmax(210px, .7fr) minmax(280px, 1fr); gap: 22px; padding: 16px 18px; background: var(--sheet); border: 1px solid var(--rule); }
+.charge-controls .eyebrow { font-size: 11px; }
+.adapter-label { color: var(--ink-2); font-weight: 400; letter-spacing: 0; margin-left: 12px; text-transform: none; }
+.charge-modes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 9px 0; }
+.charge-modes button { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; padding: 8px 10px; background: var(--paper); border: 1px solid var(--rule); border-top: 3px solid var(--rule); }
+.charge-modes button[aria-pressed="true"] { border-color: var(--a28); background: var(--a28-soft); }
+.charge-modes strong { font-family: var(--font-display); font-size: 14px; }
+.charge-modes span, .charge-modes small { font-size: 11px; white-space: nowrap; }
+.charge-modes small { color: var(--ink-2); }
+.charge-slider { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.charge-slider input { flex: 1; min-width: 50px; accent-color: var(--a28); }
+.charge-slider output { min-width: 108px; text-align: right; font-variant-numeric: tabular-nums; }
+.charge-estimate { display: flex; flex-direction: column; justify-content: center; gap: 6px; border-left: 1px solid var(--rule); padding-left: 22px; }
+.charge-estimate > strong { font: 650 26px/1.15 var(--font-display); }
+#chargeLimits { font-size: 12px; color: var(--ink-2); }
+.charge-estimate .hint { margin: 0; }
+.charge-deadline label { font-size: 13px; font-weight: 600; }
+.deadline-input { display: flex; gap: 8px; align-items: center; margin-top: 9px; }
+.deadline-input input { width: 72px; padding: 6px 8px; border: 1px solid var(--rule); background: var(--sheet); }
+.charge-deadline .hint, #chargePlanStatus { margin: 7px 0 0; font-size: 11px; }
+#chargePlanStatus { color: var(--ink); }
+@media (max-width: 1150px) { .charge-controls { grid-template-columns: minmax(330px, 1fr) minmax(210px, .7fr); } .charge-deadline { grid-column: 1 / -1; } }
+@media (max-width: 650px) { .charge-controls { grid-template-columns: minmax(0, 1fr); gap: 14px; padding: 12px; } .charge-estimate { border-left: 0; border-top: 1px solid var(--rule); padding: 12px 0 0; } .adapter-label { display: block; margin: 3px 0 0; } .charge-modes button { padding: 7px 5px; } .charge-slider { flex-wrap: wrap; } }
 
 /* Başlık */
 .top {

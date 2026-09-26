@@ -8,7 +8,7 @@
   const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const app = $('app');
 
-  const META = { author: 'Osman Çekilmez · 233302006', advisor: 'Dr. Öğr. Üyesi Osman Özer', date: '24.09.2026' };
+  const META = { author: 'Osman Çekilmez · 233302006', advisor: 'Dr. Öğr. Üyesi Osman Özer', date: '26.09.2026' };
   $('sheet').innerHTML = Schematic.build(META);
   const svg = $('sheet').querySelector('svg');
   const S = id => svg.getElementById ? svg.getElementById(id) : document.getElementById(id);
@@ -17,7 +17,7 @@
   const STATE_TR = {
     CC_MODE: ['Sabit akım', ''], CV_MODE: ['Sabit gerilim', ''], CHARGE_DONE: ['Şarj tamam', 'done'],
     TEMP_FAULT: ['Sıcaklık hatası', 'fault'], LOW_TEMP: ['Soğuk: bekliyor', 'warn'],
-    SENSOR_FAULT: ['Sensör hatası', 'fault'], TIMEOUT: ['Zaman aşımı', 'fault'], MCU_OFF: ['Arduino kapalı', 'warn'], OV_FAULT: ['Aşırı gerilim', 'fault'],
+    SENSOR_FAULT: ['Sensör hatası', 'fault'], TIMEOUT: ['Zaman aşımı', 'fault'], MCU_OFF: ['Arduino kapalı', 'warn'], OV_FAULT: ['Aşırı gerilim', 'fault'], OC_FAULT: ['Aşırı akım', 'fault'],
   };
 
   // --- Durum -----------------------------------------------------------------
@@ -25,6 +25,7 @@
   let cfg = CA.presetFor('improved');
   let sys, running = false, busy = false, last = performance.now(), lastSlow = 0, evShown = 0;
   let selPart = null, plot2 = 'cells', activeScen = 'normal', prog = null, dsgSoc0 = null;
+  let chargeControls;
   const presetOf = () => 'improved';
 
   function fresh(note) {
@@ -38,10 +39,10 @@
 
   // --- Parametre alanları ----------------------------------------------------
   const F = {
-    iSafe: ['SAFE akımı', 'A', 0.1], iFast: ['FAST akımı', 'A', 0.1], vCv: ['CV hedefi', 'V', 0.01], iCut: ['Bitiş akımı', 'A', 0.01],
+    iSafe: ['SAFE akımı', 'A', 0.1], iFast: ['FAST akımı', 'A', 0.1], vCv: ['CV hedefi', 'V', 0.01], iCut: ['Bitiş akımı', 'A', 0.01], cutFilterS: ['Bitiş akımı filtresi', 's', 1],
     tDerate: ['Akım azaltma başlangıcı', '°C', 1], tCut: ['Sıcaklık kesme', '°C', 1], tResume: ['Yeniden başlama', '°C', 1],
-    safetyTimerMin: ['Güvenlik zamanlayıcısı', 'dk', 10], doneDebounceS: ['Bitiş onay süresi', 's', 1],
-    xlCcA: ['CC potu (akım tavanı)', 'A', 0.1],
+    safetyTimerMin: ['Güvenlik zamanlayıcısı', 'dk', 10], doneDebounceS: ['Bitiş onay süresi', 's', 1], ccDeadbandA: ['CC ölü bandı', 'A', .01],
+    xlCcA: ['CC potu nominal tavanı', 'A', 0.01], xlCcErrorPct: ['CC potu gerçek sapması', '%', 0.5], xlCcTolerancePct: ['CC toplam üst sapma bütçesi', '%', 0.5],
     rBot: ['R_alt (modülde ölçülen FB–GND)', 'Ω', 10], rTop: ['Takılan sabit R_üst', 'Ω', 100],
     vrefErrPct: ['Bu modülün V_FB sapması', '%', 0.5], ceilTrim: ['Tavan multimetreyle 12.60 V\'a ayarlandı', 'chk'], trimTargetV: ['Ayar hedefi', 'V', 0.01],
     swOvp: ['Yazılım OVP (röle açar)', 'chk'], rInj: ['R3 enjeksiyon direnci', 'Ω', 100], rFilt: ['R4 filtre direnci', 'Ω', 100],
@@ -49,14 +50,22 @@
     vccErrPct: ['5 V hattı sapması', '%', 0.5], bmsOvp: ['Hücre OVP', 'V', 0.01], bmsOvpRel: ['OVP bırakma', 'V', 0.01],
     bmsUvp: ['Hücre UVP', 'V', 0.01], balV: ['Balans başlangıcı', 'V', 0.01], balA: ['Balans akımı', 'A', 0.01],
     ambientC: ['Ortam sıcaklığı', '°C', 1], extraHeatW: ['Dış ısı yükü', 'W', 0.5], loadA: ['Yük akımı', 'A', 0.1], rthKW: ['Isıl direnç', 'K/W', 1],
-    adapterV: ['Adaptör', '', null, [['12', '12 V'], ['15', '15 V'], ['19', '19 V']]],
+    adapterV: ['Adaptör gerilimi', '', null, [['12', '12 V'], ['15', '15 V'], ['19', '19 V'], ['19.5', 'Sony · 19.5 V']]],
+    adapterMaxA: ['Adaptör akım kapasitesi', 'A', 0.1],
     powerMethod: ['XL4015 kontrolü', '', null, [['injection', 'Sabit bölücü + diyotlu enjeksiyon']]],
-    isense: ['Akım/gerilim ölçümü', '', null, [['discrete', 'Ayrık: 0.1 Ω + op-amp + bölücü'], ['ina219', 'INA219, 0.1 Ω']]],
+    isense: ['Akım/gerilim ölçümü', '', null, [['ina219', 'INA219 · R050 · önerilen'], ['discrete', 'Eski ayrık ölçüm · en fazla 2.8 A']]],
+    inaShuntR: ['Takılı INA219 şöntü', 'Ω', .01], inaCalShuntR: ['Kalibrasyondaki şönt değeri', 'Ω', .01],
+    inaShuntRangeV: ['INA219 şönt aralığı', '', null, [['0.04', '±40 mV'], ['0.08', '±80 mV'], ['0.16', '±160 mV'], ['0.32', '±320 mV']]],
+    inaBusRangeV: ['INA219 bus aralığı', '', null, [['16', '16 V'], ['32', '32 V (giriş hâlâ ≤26 V)']]],
+    inaCurrentLsbA: ['INA219 akım LSB', 'A/bit', .0001], inaShuntErrPct: ['Şönt gerçek sapması', '%', .1],
+    inaGainErrPct: ['INA219 akım kazanç hatası', '%', .1], inaBusErrPct: ['INA219 bus kazanç hatası', '%', .1],
+    inaOffsetUv: ['INA219 şönt ofseti', 'µV', 10], inaConnected: ['INA219 yanıt veriyor', 'chk'],
+    tempMux: ['Üç hücre sıcaklığı (CD4051)', 'chk'], tempSensorFaultIndex: ['Kopuk sıcaklık kanalı (−1: yok)', '', 1], highRateMinC: ['BOOST/MAX alt sıcaklık eşiği', '°C', 1],
     shuntR: ['Şönt direnci', 'Ω', 0.01], ampGain: ['Op-amp kazancı', '×', 1], ampOffsetMv: ['Op-amp ofseti', 'mV', 0.5],
     lcdBus: ['LCD bağlantısı', '', null, [['i2c', 'I²C (A4/A5)'], ['parallel', 'Paralel (D2–D6, D8)']]],
     autoZero: ['Açılışta ofset sıfırlama', 'chk'], divErrPct: ['Bölücü oran hatası', '%', 0.1], vCal: ['Multimetreyle tek nokta kalibrasyon', 'chk'],
     pwmBits: ['PWM çözünürlüğü', '', null, [['8', '8-bit (D6)'], ['10', '10-bit (D9)']]],
-    fast: ['Şarj modu (D12)', '', null, [['false', 'SAFE'], ['true', 'FAST']]],
+    fast: ['Temel şarj modu', '', null, [['false', 'SAFE'], ['true', 'FAST']]],
     adapterOn: ['Adaptör bağlı', 'chk'], tempSensorOk: ['TMP36 bağlı', 'chk'], balanceOn: ['BMS balansı', 'chk'],
     cellMonitor: ['Hücre bazlı izleme', 'chk'], vccCal: ['Vcc kalibrasyonu (bandgap)', 'chk'], subtractShuntDrop: ['Şönt düşümünü çıkar', 'chk'],
     lowTempInhibit: ['0 °C altında şarjı engelle', 'chk'], sensorCheck: ['Sensör arızası denetimi', 'chk'], watchdog: ['Watchdog (1 s)', 'chk'],
@@ -72,9 +81,12 @@
     const want = cfg.isense === 'discrete' ? 'parallel' : 'i2c';
     if (cfg.lcdBus !== want) {
       cfg.lcdBus = want;
-      sys.log(want === 'parallel' ? 'Ayrık ölçüm: LCD paralel bağlandı (D2–D6, D8); A4 akım girişi oldu, A5 boş.' : 'LCD I²C\'ye döndü (A4/A5, INA219 ile aynı hat).', 'warn');
+      sys.log(want === 'parallel' ? 'Eski ayrık ölçüm: LCD paralel; A5 pot. Sıcaklık çoklayıcısı devre dışı, akım en fazla 2.8 A.' : 'INA219 ve LCD A4/A5 I²C; A3 pot; D2–D4 sıcaklık çoklayıcısı.', 'warn');
       if (tab === 'params') renderParams();
     }
+    cfg.tempMux = cfg.isense === 'ina219';
+    if (cfg.isense === 'discrete') cfg.xlCcA = Math.min(cfg.xlCcA, 3);
+    renderParams();
     if (tab === 'rev') renderRevisions();
     if (selPart === 'ina' || selPart === 'meas-disc') { selPart = cfg.isense === 'discrete' ? 'meas-disc' : 'ina'; renderInspector(); }
   }
@@ -82,8 +94,9 @@
     const k = e.target.dataset && e.target.dataset.k; if (!k) return;
     const el = e.target;
     if (el.type === 'checkbox') cfg[k] = el.checked;
-    else if (F[k][3]) cfg[k] = k === 'fast' ? el.value === 'true' : (k === 'adapterV' || k === 'pwmBits') ? +el.value : el.value;
+    else if (F[k][3]) cfg[k] = k === 'fast' ? el.value === 'true' : typeof cfg[k] === 'number' ? +el.value : el.value;
     else { const v = parseFloat(el.value); if (Number.isFinite(v)) cfg[k] = v; }
+    if (k === 'fast' || k === 'iSafe' || k === 'iFast') cfg.chargeCurrentA = null;
     sys.log(`${F[k][0]}: ${el.type === 'checkbox' ? (cfg[k] ? 'açık' : 'kapalı') : (el.options ? el.options[el.selectedIndex].text : cfg[k] + ' ' + F[k][1])}`);
     if (k === 'isense') onMeasChange();
     renderChecks();
@@ -99,11 +112,12 @@
       cfg.cells.map((c, i) => `<span>H${i + 1}</span><input data-cell="${i}" data-f="soc" type="number" value="${Math.round(c.soc * 100)}"><input data-cell="${i}" data-f="cap" type="number" step="0.5" value="${+(c.capacityScale * 100).toFixed(1)}"><input data-cell="${i}" data-f="rs" type="number" step="0.01" value="${c.rScale}"><input data-cell="${i}" data-f="sd" type="number" step="0.1" value="${c.sdPctMonth ?? 0}">`).join('') +
       `</div><div class="actions" style="margin:6px 0"><button class="btn sm" data-cells="real">Gerçekçi dağılım</button><button class="btn sm" data-cells="ideal">Özdeş hücreler</button></div>${field('rthKW')}</fieldset>`;
     $('params').innerHTML =
-      g('Şarj', ['fast', 'iSafe', 'iFast', 'vCv', 'iCut', 'safetyTimerMin', 'doneDebounceS']) +
-      g('Sıcaklık', ['tDerate', 'tCut', 'tResume', 'lowTempInhibit', 'sensorCheck']) +
-      g('Güç katı ve ölçüm', ['powerMethod', 'xlCcA', 'adapterV', 'isense', 'pwmBits', 'vccErrPct']) +
+      g('Şarj', ['fast', 'iSafe', 'iFast', 'vCv', 'iCut', 'safetyTimerMin', 'doneDebounceS', 'cutFilterS', 'ccDeadbandA']) +
+      g('Sıcaklık', ['tempMux', 'tempSensorFaultIndex', 'highRateMinC', 'tDerate', 'tCut', 'tResume', 'lowTempInhibit', 'sensorCheck']) +
+      g('Güç katı ve ölçüm', ['powerMethod', 'xlCcA', 'xlCcErrorPct', 'xlCcTolerancePct', 'adapterV', 'adapterMaxA', 'isense', 'pwmBits', 'vccErrPct']) +
+      (cfg.isense === 'ina219' ? g('INA219 · I²C 0x40', ['inaShuntR', 'inaCalShuntR', 'inaCurrentLsbA', 'inaShuntRangeV', 'inaBusRangeV', 'inaShuntErrPct', 'inaGainErrPct', 'inaBusErrPct', 'inaOffsetUv', 'inaConnected']) : '') +
       g('Sabit bölücü (tavan)', ['rBot', 'rTop', 'vrefErrPct', 'ceilTrim', 'trimTargetV']) +
-      g('Ayrık ölçüm (ölçüm = Ayrık iken)', ['shuntR', 'ampGain', 'ampOffsetMv', 'autoZero', 'divErrPct', 'vCal', 'lcdBus']) +
+      (cfg.isense === 'discrete' ? g('Eski ayrık ölçüm', ['shuntR', 'ampGain', 'ampOffsetMv', 'autoZero', 'divErrPct', 'vCal', 'lcdBus']) : '') +
       g('PWM → FB arabirimi', ['rInj', 'rFilt', 'diodeV']) +
       g('Firmware', ['cellMonitor', 'vccCal', 'subtractShuntDrop', 'watchdog', 'swOvp']) +
       g('BMS', ['bmsPresent', 'bmsOvp', 'bmsOvpRel', 'bmsUvp', 'balV', 'balA', 'balanceOn', 'fuseA']) +
@@ -152,14 +166,16 @@
       kv: [['Çözünürlük', `${cfg.pwmBits}-bit`], ['Duty', `${sys.hw.duty} / ${sys.pwmMax()}`]], f: ['pwmBits'] }),
     relay: () => ({ t: 'Röle', r: 'K1 · D7', d: 'NO kontak: Arduino\'nun beslemesi kesilirse kontak açılır ve paket şarj devresinden ayrılır. Hata durumlarında firmware röleyi bırakır.',
       kv: [['Kontak', sys.hw.relay ? 'kapalı (iletiyor)' : 'açık']], f: [] }),
-    ina: () => ({ t: 'Akım ve gerilim ölçümü', r: rev === 'B' ? 'U3 INA219 · R5 0.1 Ω' : 'R5 1 Ω · A3',
-      d: 'INA219: high-side şönt, I²C. Bus LSB 4 mV, şönt LSB 10 µV (0.1 Ω\'da 0.1 mA). Kendi referansını kullandığı için 5 V hattındaki sapmadan etkilenmez.',
-      why: '0.1 Ω\'da 1.4 A için kayıp 0.2 W, düşüm 0.14 V.', whyA: '1 Ω\'da 1.4 A için kayıp 1.96 W, düşüm 1.4 V. Low-side olduğundan paket ölçümü I·1 Ω kadar yüksek çıkar.',
-      kv: [['Gerçek akım', `${fmt(sys.hw.iCharge, 4)} A`], ['Ölçülen', `${fmt(sys.fw.meas.i, 4)} A`], ['Şönt kaybı', `${fmt(sys.hw.iCharge ** 2 * sys.rShunt(), 2)} W`]], f: ['isense', 'subtractShuntDrop'] }),
+    ina: () => ({ t: 'Akım ve gerilim ölçümü', r: rev === 'B' ? 'U3 INA219 · R5 R050 ≥2 W' : 'R5 1 Ω · A3',
+      d: 'High-side Kelvin bağlantısı; ±320 mV şönt aralığı. R050: 4 A → 200 mV / 0.80 W. Modüldeki R100 değiştirilir; 4 A\'de R100 ölçüm aralığını aşar.',
+      why: 'CurrentLSB = 200 µA, CAL = 4096 (0x1000); nominal akım aralığı ±6.4 A. Hazır kütüphanenin R100 kalibrasyonu kullanılmaz. I²C kaybı, taşma veya geçersiz ölçüm şarjı kilitler.',
+      whyA: '1 Ω şönt, 1.4 A\'de 1.96 W kayıp ve 1.4 V düşüm oluşturur.',
+      kv: [['Gerçek akım', `${fmt(sys.hw.iCharge, 4)} A`], ['Ölçülen', `${fmt(sys.fw.meas.i, 4)} A`], ['Şönt kaybı', `${fmt(sys.hw.iCharge ** 2 * sys.rShunt(), 2)} W`], ['CAL', String(CA.INA219.calibration(cfg))]],
+      f: ['isense', 'inaShuntR', 'inaCalShuntR', 'inaCurrentLsbA', 'inaConnected'] }),
     'sense-a': () => PARTS.ina(),
     'meas-disc': () => ({ t: 'Ayrık akım ve gerilim ölçümü', r: 'R5 0.1 Ω · U3 LM358 ×10 → A4 · R6/R7 10k/4.7k → A3',
       d: 'Şönt eksi hatta (low-side). Şönt gerilimi (1.4 A\'de 0.14 V) op-amp ile ×10 büyütülür: 1 ADC adımı ≈ 4.9 mA. LM358 5 V beslemede ~3.5 V\'a kadar çıkabildiği için 3.5 A\'e kadar ölçer. Bölücü paket+ ile GND arasını görür: firmware V_paket = V_bölücü − I·R5 hesaplar.',
-      why: 'Olmazsa olmazlar: (1) açılışta röle açıkken op-amp ofseti ölçülüp çıkarılır (LM358 2–7 mV → ×10 → 20–70 mA hata), (2) multimetreyle tek nokta kalibrasyon: paket gerilimi DMM ile ölçülür, katsayı EEPROM\'a yazılır. Kalibrasyonsuz hücre uçları da yanlış okunur; simülasyonda dengesiz pakette bir hücre 4.25 V\'a çıkıyor. Tek LCD paralel bağlanır (D2–D6, D8), A4 akım girişi olur, A5 boş kalır.',
+      why: 'Olmazsa olmazlar: (1) açılışta röle açıkken op-amp ofseti ölçülüp çıkarılır (LM358 2–7 mV → ×10 → 20–70 mA hata), (2) multimetreyle tek nokta kalibrasyon: paket gerilimi DMM ile ölçülür, katsayı EEPROM\'a yazılır. Kalibrasyonsuz hücre uçları da yanlış okunur; simülasyonda dengesiz pakette bir hücre 4.25 V\'a çıkıyor. Tek LCD paralel bağlanır (D2–D6, D8), A4 akım girişi, A5 kullanıcı ayar potu olur.',
       kv: [['Gerçek akım', `${fmt(sys.hw.iCharge, 3)} A`], ['Ölçülen', `${fmt(sys.fw.meas.i, 3)} A`], ['Gerçek paket', `${fmt(sys.hw.vPack, 3)} V`], ['Ölçülen', `${fmt(sys.fw.meas.v, 3)} V`],
         ['Şönt kaybı', `${fmt(sys.hw.iCharge ** 2 * cfg.shuntR, 2)} W`], ['Ofset tahmini', sys.fw.zeroI != null ? `${fmt(sys.fw.zeroI * 1000, 0)} mA` : '—']],
       f: ['isense', 'shuntR', 'ampGain', 'ampOffsetMv', 'autoZero', 'divErrPct', 'vCal', 'lcdBus'] }),
@@ -173,14 +189,15 @@
     bms: () => ({ t: '3S balanslı BMS', r: 'U4', d: 'Hücre başına aşırı şarj (OVP), aşırı deşarj (UVP) ve kısa devre koruması; ≥ balans eşiğindeki hücreden direnç üzerinden akım çeker. MOSFET\'ler eksi hattadır (B− ↔ P−).',
       kv: [['Şarj MOSFET\'i', sys.bms.chgFet ? 'açık' : 'KAPALI'], ['Neden', sys.bms.reason], ['OVP tetiklenme', `${sys.stats.ovpTrips}×`], ['Balans', sys.bms.bal.map((b, i) => b ? 'H' + (i + 1) : '').filter(Boolean).join(', ') || '—']],
       f: ['bmsOvp', 'bmsOvpRel', 'bmsUvp', 'balV', 'balA', 'balanceOn'] }),
-    taps: () => ({ t: 'Hücre izleme uçları', r: 'A1 · A2', d: `H1+ doğrudan A1\'e, H2+ 10k/10k bölücüyle A2\'ye; H3+ ${cfg.isense === 'ina219' ? 'INA219 bus geriliminden' : 'paket bölücüsünden (A3)'}. Uno\'da A6/A7 yok; plan A0–A4\'e sığdırıldı.`,
-      why: 'Firmware hiçbir hücrenin 4.20 V\'u aşmasına izin vermez. Dengesiz pakette BMS OVP\'ye ulaşılmaz.',
+    taps: () => ({ t: 'Hücre izleme uçları', r: 'A1 · A2', d: `H1+ doğrudan A1\'e, H2+ 10k/10k bölücüyle A2\'ye; H3+ ${cfg.isense === 'ina219' ? 'INA219 bus geriliminden' : 'paket bölücüsünden (A3)'}. Uno\'da A6/A7 yok; analog plan A0–A5 sınırındadır.`,
+      why: 'Hücre sınırlaması ölçülen 4.20 V üzerinden çalışır. A1/A2 ADC ve INA219 paket ölçümü birlikte kalibre edilmelidir; ölçüm hatası gerçek hücre gerilimine yansır. Paket tavanı tek başına hücre koruması değildir.',
       kv: sys.fw.meas.cells.map((v, i) => [`H${i + 1} ölçülen`, `${fmt(v, 3)} V (gerçek ${fmt(cellV(i), 3)})`]), f: ['cellMonitor', 'vccCal'] }),
-    tmp: () => ({ t: 'Sıcaklık sensörü', r: 'U5 TMP36 · A0', d: 'H2 yüzeyine yapıştırılır. 0 °C\'de 0.5 V, +10 mV/°C. 10-bit ADC\'de 1 LSB ≈ 0.49 °C.',
-      why: 'Kopuk sensör −50 °C okur; firmware bunu arıza sayar ve şarjı durdurur.',
-      kv: [['Hücre', `${fmt(sys.cells[1].tempC, 1)} °C`], ['Okunan', `${fmt(sys.fw.meas.t, 1)} °C`]], f: ['tempSensorOk', 'sensorCheck', 'lowTempInhibit'] }),
+    tmp: () => ({ t: 'Hücre sıcaklıkları', r: 'U5A–C TMP36 · U7 CD4051 · A0',
+      d: 'Her hücreye bir TMP36; CD4051 kanal seçimi D2–D4, ortak çıkış A0. Her sensör girişinde 100 kΩ pull-down kopuk hattı tanımlı seviyeye çeker. ADC çözünürlüğü yaklaşık 0.49 °C.',
+      why: 'En sıcak hücre 35 °C üstünde akımı azaltır, 45 °C keser. En soğuk hücre 12 °C altında veya üçlü ölçüm yoksa BOOST/MAX en fazla SAFE 1.4 A olur. Sensör arızası yeniden başlatmaya kadar kilitlidir.',
+      kv: sys.fw.meas.temps.map((v, i) => [`H${i + 1} ölçülen`, `${fmt(v, 1)} °C`]), f: ['tempMux', 'tempSensorOk', 'tempSensorFaultIndex', 'highRateMinC'] }),
     uno: () => ({ t: 'Arduino Uno', r: 'U2 · ATmega328P', d: '500 ms döngü: ölç → güvenlik kontrolleri → CC/CV kararı → PWM. Firmware değişiklikleri devre çiziminde görünmediği için burada listelenir.',
-      why: 'Rev B firmware: 0 °C altında şarj yok · sensör arızası denetimi · 5 s bitiş onayı · 240 dk güvenlik zamanlayıcısı · watchdog · 16 örnek ADC ortalaması · SAFE 1.4 A / FAST 2.8 A · bitiş 140 mA.',
+      why: 'Rev B: 1.0–4.0 A canlı seçim · MAX donanımda nominal 3.90 A · CC ve CV boyunca akım sınırı · 35 °C üstünde azaltma · 45 °C kesme · 240 dk zamanlayıcı · bitiş 140 mA. Besleme: U6, 19.5 V → 7.5 V → Vin. Süre planlayıcısı tarayıcıda; MCU firmware aktarımı ayrı adımdır.',
       whyA: 'Rev A firmware: 1.0 A, bitiş 100 mA; soğuk, sensör ve kilitlenme denetimi yok; bitiş koşulu tek okumayla tetiklenir.',
       kv: [['Durum', sys.fw.state], ['Döngü', '500 ms']], f: ['fast', 'iSafe', 'iFast', 'watchdog', 'doneDebounceS'] }),
   };
@@ -303,7 +320,7 @@
     if (b.dataset.live) { LIVE.find(x => x.id === b.dataset.live).act(); renderChecks(); return; }
     const sc = findScen(b.dataset.scen);
     activeScen = sc.id;
-    const keep = { fast: cfg.fast };
+    const keep = { fast: cfg.fast, chargeCurrentA: cfg.chargeCurrentA };
     cfg = Object.assign(CA.presetFor(presetOf(rev)), keep);
     sc.apply(cfg);
     prog = newProg(sc);
@@ -379,7 +396,7 @@
     return [{ points: pts, axis: 'left', color: col, hollow: true }];
   }
   function drawCharts() {
-    const I = cfg.fast ? cfg.iFast : cfg.iSafe;
+    const I = sys.requestedCurrent();
     const socs = cfg.cells.map(c => c.soc), caps = cfg.cells.map(c => c.capacityScale);
     // Datasheet eğrisi tek hücre içindir: paket yaklaşık dengeliyse (SOC farkı < %2, kapasite farkı < %5) üst üste çizilir
     const balanced = Math.max(...socs) - Math.min(...socs) < 0.02 && Math.max(...caps) - Math.min(...caps) < 0.05;
@@ -405,8 +422,18 @@
 
   // --- Tasarım kontrolleri -----------------------------------------------------
   function checks() {
-    const c = cfg, out = [], I = c.fast ? c.iFast : c.iSafe, rsh = c.isense === 'shunt1' ? 1 : c.isense === 'discrete' ? c.shuntR : 0.1;
+    const c = cfg, out = [], I = c.chargeCurrentA ?? (c.fast ? c.iFast : c.iSafe), rsh = c.isense === 'shunt1' ? 1 : c.isense === 'discrete' ? c.shuntR : CA.INA219.shuntResistance(c);
     const add = (n, v, l, note) => out.push({ n, v, l, note });
+    const pIn = (c.vCv + I * (rsh + c.rPathOhm)) * I / c.converterEfficiency;
+    add('Adaptör güç bütçesi', `${fmt(pIn, 1)} / ${fmt(c.adapterV * c.adapterMaxA, 1)} W`, pIn < c.adapterV * c.adapterMaxA * .8 ? 'ok' : 'warn', '%90 dönüşüm verimi varsayımı; kontrol elektroniği için ek pay bırakılır');
+    const upper = c.xlCcA * (1 + c.xlCcTolerancePct / 100);
+    add('Donanım akım tavanı', `${fmt(c.xlCcA, 2)} A nominal · ${fmt(upper, 3)} A üst`, upper <= 4 && Math.abs(c.xlCcErrorPct) <= c.xlCcTolerancePct ? 'ok' : 'bad', '3.90 A ve %2 toplam hata/ripple bütçesi → 3.978 A. Bu bütçe modül garantisi değil, yük ve sıcaklık altında ölçülecek kabul şartıdır.');
+    if (c.isense === 'ina219') {
+      add('INA219 aralık / kalibrasyon', `${fmt(CA.INA219.range(c), 2)} A · CAL ${CA.INA219.calibration(c)}`, CA.INA219.range(c) >= upper && Math.abs(c.inaShuntR / c.inaCalShuntR - 1) < .015 ? 'ok' : 'bad', 'R050, ±320 mV, CurrentLSB 200 µA, CAL 4096; fiziksel şönt ile yazılım kalibrasyonu eşleşmeli.');
+      add('Üç hücre sıcaklık ölçümü', c.tempMux ? '3 × TMP36 / CD4051' : 'tek sensör', c.tempMux ? 'ok' : 'warn', 'BOOST/MAX için bütün hücreler ≥12 °C; tek sensörde yüksek akım SAFE seviyesine düşer.');
+      add('Güç katı ısıl kabulü', 'fiziksel test gerekli', 'warn', 'Bobin, diyot ve MOSFET sıcaklığı simüle edilmez. 4 A sınıfında sürekli yük testi ve soğutucu/hava akışı gerekir.');
+    }
+    if (c.isense === 'discrete') add('Akım ölçüm çıkışı', `${fmt(I * c.shuntR * c.ampGain, 2)} V`, I * c.shuntR * c.ampGain < 3.2 ? 'ok' : 'bad', '5 V LM358: üst raya çıkamaz; 2.8 A hedefi ve 3.0 A donanım tavanı için pay bırakılır');
     const head = c.adapterV - (c.vCv + I * (rsh + c.rPathOhm + 0.15) + 0.4);
     add('Adaptör başlık payı', `${fmt(head, 2)} V`, head > 0.8 ? 'ok' : head > 0 ? 'warn' : 'bad', `${c.adapterV} V giriş; 12.60 V + yol düşümleri + XL4015 düşümü karşılanmalı`);
     if (c.powerMethod === 'injection') {
@@ -418,21 +445,22 @@
     } else add('Donanım gerilim tavanı', 'yok', 'bad', 'Pot sökülü, yerine bölücü yok: XL4015 açık çevrim; tek sınır BMS OVP');
     add('Yazılım OVP', c.swOvp ? 'var' : 'yok', c.swOvp ? 'ok' : 'warn', 'Ölçülen paket > 12.62 V ya da hücre > 4.215 V, 0.5 s → röle açılır');
     const psh = I * I * rsh;
-    add('Şönt kaybı', `${fmt(psh, 2)} W`, psh < .5 ? 'ok' : psh < 2 ? 'warn' : 'bad', rsh === 1 ? `1 Ω'da ${fmt(I, 1)} V düşüm; ≥ ${Math.ceil(psh * 2)} W direnç gerekir` : c.isense === 'discrete' ? `${rsh} Ω şönt: ≥ ${Math.max(0.5, Math.ceil(psh * 4) / 2)} W direnç yeterli` : 'INA219 0.1 Ω');
+    add('Şönt kaybı', `${fmt(psh, 2)} W`, psh < .5 ? 'ok' : psh < 2 ? 'warn' : 'bad', rsh === 1 ? `1 Ω'da ${fmt(I, 1)} V düşüm; ≥ ${Math.ceil(psh * 2)} W direnç gerekir` : c.isense === 'discrete' ? `${rsh} Ω şönt: ≥ ${Math.max(0.5, Math.ceil(psh * 4) / 2)} W direnç yeterli` : 'R050: 4 A için 0.80 W; ≥2 W şönt, Kelvin bağlantısı ve uygun PCB akım yolu');
     if (c.isense === 'shunt1') add('Low-side şönt ölçüm hatası', c.subtractShuntDrop ? 'düzeltiliyor' : `+${fmt(I, 2)} V`, c.subtractShuntDrop ? 'warn' : 'bad', 'Bölücü V_paket + I·R ölçer; CV erken başlar');
-    const vErr = c.isense === 'ina219' ? 0.5 : (c.vccCal ? 0.3 : Math.max(Math.abs(c.vccErrPct), 5));
-    add('Gerilim ölçüm belirsizliği', `±${fmt(12.6 * vErr / 300 * 1000, 0)} mV/hücre`, vErr <= 0.5 ? 'ok' : vErr <= 1.2 ? 'warn' : 'bad',
-      c.isense === 'ina219' ? 'INA219 bus hatası 25 °C\'de ±0.5 % maks.' : 'ADC referansı 5 V hattı (USB: 4.75–5.25 V)');
+    const vErr = c.isense === 'ina219' ? Math.abs(c.inaBusErrPct) : (c.vccCal ? 0.3 : Math.max(Math.abs(c.vccErrPct), 5));
+    add('Gerilim ölçüm belirsizliği', `±${fmt(12.6 * vErr / 100 * 1000, 0)} mV/paket`, vErr <= 0.5 ? 'ok' : vErr <= 1.2 ? 'warn' : 'bad',
+      c.isense === 'ina219' ? 'INA bus hata parametresi. Hücre fark ölçümünde ADC ve bus hataları birleşir; paket hatası üçe bölünüp hücre doğruluğu sayılamaz.' : 'ADC referansı 5 V hattı (USB: 4.75–5.25 V)');
     // Uno: A0–A5; I²C LCD varsa A4/A5 dolu
     // Uno: A0–A5. Tek LCD var; I²C ise A4/A5'i kullanır (INA219 de aynı I²C hattında).
     const i2c = c.isense === 'ina219' || c.lcdBus === 'i2c';
-    const need = 1 + (c.cellMonitor ? 2 : 0) + (c.isense === 'ina219' ? 0 : 2) + (i2c ? 2 : 0);
+    const need = 1 + (c.cellMonitor ? 2 : 0) + (c.isense === 'ina219' ? 1 : 2) + (i2c ? 2 : 1);
     add('Uno analog pin bütçesi', `${need} / 6`, need <= 6 ? 'ok' : 'bad',
-      c.isense === 'ina219' ? 'A0 TMP36 · A1/A2 hücre uçları · A4/A5 I²C (INA219 + LCD aynı hatta) · A3 boş'
-        : c.lcdBus === 'parallel' ? 'A0 TMP36 · A1/A2 hücre uçları · A3 paket bölücü · A4 akım (op-amp) · A5 boş. LCD paralel: D2–D6, D8 (ikinci LCD olmadığı için dijital pinler yetiyor)'
+      c.isense === 'ina219' ? 'A0 sıcaklık çoklayıcısı · A1/A2 hücre uçları · A3 ayar potu · A4/A5 I²C (INA219 + LCD)'
+        : c.lcdBus === 'parallel' ? 'A0 TMP36 · A1/A2 hücre uçları · A3 paket bölücü · A4 akım (op-amp) · A5 ayar potu. LCD paralel: D2–D6, D8'
         : `TMP36 + ${c.cellMonitor ? '2 hücre ucu + ' : ''}paket bölücü + akım + I²C LCD (A4/A5) = ${need}: sığmıyor. LCD\'yi paralel bağla`);
     if (c.isense !== 'ina219' && c.lcdBus === 'parallel')
-      add('Uno dijital pin bütçesi', '12 / 12', 'warn', 'D2–D6, D8 LCD · D7 röle · D9 PWM · D10 buzzer · D11/D13 LED · D12 mod anahtarı. Tamamı dolu; yeni çıkış için A5 dijital olarak kullanılabilir.');
+      add('Uno dijital pin bütçesi', '12 / 12', 'warn', 'D2–D6, D8 LCD · D7 röle · D9 PWM · D10 buzzer · D11/D13 LED · D12 mod butonu. A5 ayar potuna ayrıldı.');
+    if (c.isense === 'ina219') add('Arayüz pinleri', 'A3 / D12 / D2–D4', c.lcdBus === 'i2c' ? 'ok' : 'bad', 'A3 pot, D12 mod düğmesi; D2–D4 CD4051. LCD I²C olmalı; paralel LCD çoklayıcıyla çakışır.');
     add('Hücre bazlı izleme', c.cellMonitor ? 'var' : 'yok', c.cellMonitor ? 'ok' : 'bad', 'Dengesiz pakette bir hücre 4.25 V\'a çıkar ve BMS keser');
     add('0 °C altında şarj', c.lowTempInhibit ? 'engelli' : 'serbest', c.lowTempInhibit ? 'ok' : 'bad', 'Datasheet şarj penceresi 0–60 °C');
     add('Sensör arızası denetimi', c.sensorCheck ? 'var' : 'yok', c.sensorCheck ? 'ok' : 'bad', 'Kopuk TMP36 −50 °C okur; sıcaklık koruması sessizce devre dışı kalır');
@@ -440,7 +468,7 @@
     add('BMS', c.bmsPresent ? 'takılı' : 'YOK', c.bmsPresent ? 'ok' : 'bad', c.bmsPresent ? 'Hücre OVP/UVP, kısa devre koruması ve balans' :
       'Şarjda firmware (hücre izleme + yazılım OVP) ve sabit tavan korur; ama deşarjda Arduino kapalı olduğundan alt gerilim sınırı yok, kısa devrede tek koruma F1. Balans da yok.');
     add('Watchdog', c.watchdog ? 'var' : 'yok', c.watchdog ? 'ok' : 'warn', 'Kilitlenmede röle bırakılır');
-    add('Şarj akımı', `${fmt(I, 2)} A · ${fmt(I / 2.8, 2)}C`, I <= 4 ? (I <= 1.4 ? 'ok' : 'warn') : 'bad', 'Datasheet: standart 1.4 A, maks. 4.0 A');
+    add('Şarj akımı', `${fmt(I, 2)} A · ${fmt(I / 2.8, 2)}C`, I <= (c.isense === 'ina219' ? 4 : 2.8) ? 'ok' : 'warn', 'Altı kademe: 1.0 / 1.4 / 2.1 / 2.8 / 3.5 / ≤4.0 A. MAX gerçek nominal tavanı 3.90 A; eski ayrık ölçüm en fazla 2.8 A.');
     add('Bitiş akımı', `${fmt(c.iCut * 1000, 0)} mA`, Math.abs(c.iCut - .14) < .03 ? 'ok' : 'warn', 'Datasheet: 140 mA');
     const gain = c.powerMethod === 'injection' ? CA.gainOf(c) : 1;
     const pwmStep = 5 / ((1 << c.pwmBits) - 1) * gain / (0.09 + rsh + c.rPathOhm);
@@ -466,17 +494,17 @@
   }
 
   // --- Arduino paneli ------------------------------------------------------------
-  const FSM = ['CC_MODE', 'CV_MODE', 'CHARGE_DONE', 'TEMP_FAULT', 'LOW_TEMP', 'SENSOR_FAULT', 'OV_FAULT', 'TIMEOUT', 'MCU_OFF'];
+  const FSM = ['CC_MODE', 'CV_MODE', 'CHARGE_DONE', 'TEMP_FAULT', 'LOW_TEMP', 'SENSOR_FAULT', 'OV_FAULT', 'OC_FAULT', 'TIMEOUT', 'MCU_OFF'];
   function renderArduino() {
     const m = sys.fw.meas, h = sys.hw, st = sys.fw.state;
     const short = st === 'CHARGE_DONE' ? 'TAMAM' : /FAULT|TIMEOUT/.test(st) ? 'HATA' : st === 'LOW_TEMP' ? 'SOGUK' : st.replace('_MODE', '');
     const off = st === 'MCU_OFF';
     $('lcd1').textContent = off ? ''.padEnd(16) : `V:${fmt(m.v, 2)} I:${fmt(m.i, 2)}`.padEnd(16).slice(0, 16);
-    $('lcd2').textContent = off ? ''.padEnd(16) : `${fmt(m.t, 1)}C ${short} ${cfg.fast ? 'F' : 'S'}`.padEnd(16).slice(0, 16);
+    $('lcd2').textContent = off ? ''.padEnd(16) : `${fmt(m.t, 1)}C ${short} ${(CA.CHARGE_MODES.find(x => x.amps === sys.requestedCurrent()) || { name: 'OZEL' }).name}`.padEnd(16).slice(0, 16);
     $('lcd1').parentElement.classList.toggle('dark', off);
     const rows = [['Paket', fmt(h.vPack, 3) + ' V', fmt(m.v, 3) + ' V', fmt((m.v - h.vPack) * 1000, 0) + ' mV'],
       ['Akım', fmt(h.iCharge, 3) + ' A', fmt(m.i, 3) + ' A', fmt((m.i - h.iCharge) * 1000, 0) + ' mA'],
-      ['Sıcaklık', fmt(sys.cells[1].tempC, 1) + ' °C', fmt(m.t, 1) + ' °C', fmt(m.t - sys.cells[1].tempC, 1) + ' °C']];
+      ['En sıcak', fmt(Math.max(...sys.cells.map(x => x.tempC)), 1) + ' °C', fmt(m.t, 1) + ' °C', fmt(m.t - Math.max(...sys.cells.map(x => x.tempC)), 1) + ' °C']];
     if (cfg.cellMonitor) m.cells.forEach((v, i) => rows.push([`H${i + 1}`, fmt(cellV(i), 3) + ' V', fmt(v, 3) + ' V', fmt((v - cellV(i)) * 1000, 0) + ' mV']));
     $('measTable').innerHTML = '<tr><th></th><th>Gerçek</th><th>Arduino</th><th>Fark</th></tr>' + rows.map(r => `<tr><td>${r[0]}</td>${r.slice(1).map(x => `<td class="n">${x}</td>`).join('')}</tr>`).join('');
     $('fsm').innerHTML = FSM.map(x => `<span class="${x === st ? 'on' : ''} ${/FAULT|TIMEOUT/.test(x) ? 'bad' : ''}">${x}</span>`).join('');
@@ -564,6 +592,7 @@
 
   // --- Görünüm ---------------------------------------------------------------
   function renderAll(force) {
+    if (chargeControls) chargeControls.update(force);
     const h = sys.hw, m = sys.fw.meas, st = sys.fw.state, vs = [0, 1, 2].map(cellV);
     // Okuma şeridi
     $('rV').innerHTML = `${fmt(h.vPack, 3)}<small>V</small>`;
@@ -596,13 +625,14 @@
     setT('sCeil', `tavan ${fmt(sys.ceilV(), 2)} V${cfg.ceilTrim ? '' : ' (ayarsız)'}`);
     setT('sVpwm', `${fmt(h.vFilt, 2)} V`);
     setT('sI', `I ${fmt(h.iCharge, 3)} A`);
+    setT('sInaShunt', `${fmt(cfg.inaShuntR, 2)} Ω / ≥2 W`);
     setT('sIna', `${fmt(m.i, 3)} A`);
     setT('sPack', `${fmt(h.vPack, 3)} V`);
     setT('sBms', sys.bms.shortTrip ? 'KİLİT' : sys.bms.chgFet ? 'CHG açık' : 'CHG KAPALI');
     setT('sBms2', sys.bms.reason);
     setT('sTmp', `${fmt(m.t, 1)} °C`);
     setT('sFsm', cfg.fwFrozen ? 'KİLİTLENDİ' : st === 'MCU_OFF' ? 'BESLEME YOK' : st);
-    setT('pA0', `TMP36 ${m.a0.toFixed(0)}`); setT('pA1', cfg.cellMonitor ? `H1+ ${fmt(m.cells[0], 2)} V` : '—');
+    setT('pA0', cfg.tempMux ? `3 × ${fmt(m.t, 1)} °C maks.` : `TMP36 ${m.a0.toFixed(0)}`); setT('pA1', cfg.cellMonitor ? `H1+ ${fmt(m.cells[0], 2)} V` : '—');
     setT('pA2', rev === 'A' ? `bölücü ${m.a2.toFixed(0)}` : (cfg.cellMonitor ? `H2+ ${fmt(m.cells[0] + m.cells[1], 2)} V` : '—'));
     const discB = rev === 'B' && cfg.isense === 'discrete';
     app.classList.toggle('measDisc', cfg.isense === 'discrete');
@@ -610,10 +640,11 @@
     const cm = sys.currentMode();
     document.querySelectorAll('[data-req]').forEach(b => b.setAttribute('aria-pressed', b.dataset.req === cm || (cm === 'CHARGE+LOAD' && b.dataset.req === 'CHARGE')));
     setT('plpA4', discB && cfg.lcdBus === 'parallel' ? 'A4 · A5' : 'A4/A5');
-    setT('pA3', rev === 'A' ? `şönt ${m.a3.toFixed(0)}` : discB ? `paket ${fmt(m.v, 2)} V` : '—');
-    setT('pA4', rev === 'A' ? 'LCD' : discB ? (cfg.lcdBus === 'parallel' ? `akım ${fmt(m.i, 2)} A · boş` : 'akım + LCD ✕') : 'INA219 + LCD');
-    setT('pD6', rev === 'A' ? `PWM ${h.duty}` : discB && cfg.lcdBus === 'parallel' ? 'LCD (D2–D6, D8)' : '—'); setT('pD9', rev === 'B' ? `PWM ${h.duty}` : '—');
-    setT('pD7', h.relay ? 'röle 1' : 'röle 0'); setT('pD12', cfg.fast ? 'FAST' : 'SAFE');
+    setT('pA3', rev === 'A' ? `şönt ${m.a3.toFixed(0)}` : discB ? `paket ${fmt(m.v, 2)} V` : 'ayar potu');
+    setT('pA4', rev === 'A' ? 'LCD' : discB ? (cfg.lcdBus === 'parallel' ? `I ${fmt(m.i, 2)} A · ayar` : 'akım + LCD ✕') : 'INA219 + LCD');
+    setT('plpD6', rev === 'B' && !discB ? 'D2–4' : 'D6');
+    setT('pD6', rev === 'A' ? `PWM ${h.duty}` : discB && cfg.lcdBus === 'parallel' ? 'LCD (D2–D6, D8)' : 'TMP seç'); setT('pD9', rev === 'B' ? `PWM ${h.duty}` : '—');
+    setT('pD7', h.relay ? 'röle 1' : 'röle 0'); setT('pD12', cfg.chargeCurrentA == null ? (cfg.fast ? 'FAST' : 'SAFE') : `${fmt(sys.requestedCurrent(), 1)} A`);
     vs.forEach((v, i) => {
       const n = i + 1, c = sys.cells[i];
       setT('cellV' + n, `${fmt(v, 3)} V`);
@@ -683,7 +714,7 @@
 
   $('play').addEventListener('click', () => { running = !running; sys.log(running ? 'Başlatıldı.' : 'Duraklatıldı.'); });
   $('reset').addEventListener('click', () => {
-    running = false; cfg.fwFrozen = false; cfg.pwmBroken = false; cfg.tempSensorOk = true; cfg.adapterOn = true; cfg.loadA = 0;
+    running = false; cfg.fwFrozen = false; cfg.pwmBroken = false; cfg.tempSensorOk = true; cfg.tempSensorFaultIndex = -1; cfg.inaConnected = true; cfg.adapterOn = true; cfg.loadA = 0;
     const sc = findScen(activeScen);
     if (sc) sc.apply(cfg);
     prog = newProg(sc);
@@ -702,6 +733,10 @@
   window.addEventListener('resize', drawCharts);
 
   // --- Başlat ------------------------------------------------------------------
+  chargeControls = new window.ChargeControls({ getSystem: () => sys,
+    onApply: amps => { sys.setChargeCurrent(amps); renderParams(); renderChecks(); },
+    onPause: () => { running = false; sys.log('Süre hesabı için duraklatıldı; Devam ile sürdürülür.'); },
+  });
   SC.SCENARIOS.find(x => x.id === 'normal').apply(cfg);
   prog = newProg(SC.SCENARIOS.find(x => x.id === 'normal'));
   renderScenarios(); renderParams(); renderChecks();

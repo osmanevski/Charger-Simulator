@@ -36,8 +36,8 @@ for (const sc of SCENARIOS) {
   res[sc.id] = r;
   check(`${sc.name}: ${verdict.note}`, verdict.level !== 'bad');
 }
-// Kalibreli ayrık ölçüm gerçek 12.6 V'a kadar doldurur (~125 dk, %99.5); INA219'un +%0.3 kazanç hatası ~114 dk'da %98.8'de bitirir
-check('Normal şarj 105–130 dk', res.normal.doneMin > 105 && res.normal.doneMin < 130, `${res.normal.doneMin?.toFixed(1)} dk`);
+// INA219/R050 varsayılanı: +%0.3 bus/ADC hatası ve 140 mA filtreli bitiş; süre model/kalibrasyon koşuluna bağlı.
+check('Normal şarj R050/INA219 ile 95–120 dk', res.normal.doneMin > 95 && res.normal.doneMin < 120, `${res.normal.doneMin?.toFixed(1)} dk`);
 check('Hiçbir senaryoda hücre > 4.21 V', Object.values(res).every(r => r.maxCellV <= 4.21),
   Object.entries(res).map(([k, r]) => `${k}:${r.maxCellV.toFixed(3)}`).join(' '));
 
@@ -85,9 +85,14 @@ const un = v => CA.ceilingOf({ ...sB.cfg, ceilTrim: false, vrefErrPct: v });
 check('Ayarsız sabit dirençte tavan V_FB toleransıyla 12.37–12.88 V arasında kayar', un(-2) < 12.4 && un(2) > 12.85, `${un(-2).toFixed(2)}–${un(2).toFixed(2)} V`);
 check('PWM ile çıkış ≤ 9 V\'a inebilir (derin deşarj ön şarjı)', vmin <= 9.0, `${vmin.toFixed(2)} V`);
 sB.hw.vFilt = 0; check('PWM = 0 / pin boşta → çıkış = sabit bölücü tavanı (diyot tıkamada)', sB.converterSetpoint().vSet === sB.ceilV());
+const ccRipple = db => { const c = CA.presetFor('improved'); c.ccDeadbandA = db; const s = new CA.SystemA(c);
+  s.run(4200); const h = s.history.filter(x => x.t > 1200).map(x => x.ip); return Math.max(...h) - Math.min(...h); };
+// R050 ile daha düşük seri direnç: bir 10-bit PWM adımı yaklaşık 42 mA; kabul 50 mA tepe-tepe.
+const rip0 = ccRipple(0), rip2 = ccRipple(0.02);
+check('CC ölü bandı (20 mA) PWM avlanmasını keser, akım dalgalanması azalır', rip2 < rip0 && rip2 < 0.05, `${(rip0 * 1000).toFixed(0)} → ${(rip2 * 1000).toFixed(0)} mA t-t`);
 const brk = SCENARIOS.find(s => s.id === 'pwmBreak');
 const bTrim = runScenario(brk, 'improved', c => { c.ceilTrim = true; c.swOvp = false; }).r;
-check('PWM koptu, tavan ayarlı, yazılım OVP kapalı → hücre ≤ 4.21 V (tavan korur)', bTrim.maxCellV <= 4.21, `maks. ${bTrim.maxCellV.toFixed(3)} V`);
+check('PWM koptu, tavan ayarlı, yazılım OVP kapalı → paket tavanı tek hücre 4.20 V sınırını garanti etmez', bTrim.maxCellV > 4.205 && bTrim.maxCellV < 4.25, `maks. ${bTrim.maxCellV.toFixed(3)} V`);
 const bRaw = runScenario(brk, 'improved', c => { c.swOvp = false; }).r;
 check('PWM koptu, tavan ayarsız (+%2), yazılım OVP kapalı → BMS OVP\'ye kadar çıkar', bRaw.maxCellV >= 4.249, `maks. ${bRaw.maxCellV.toFixed(3)} V`);
 const bSw = runScenario(brk, 'improved').r;

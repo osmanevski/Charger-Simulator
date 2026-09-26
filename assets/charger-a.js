@@ -10,12 +10,17 @@
  *   BMS       : hücre OVP/UVP (gecikmeli), pasif balans, kısa devre kilidi
  */
 (function (root, factory) {
-  const api = factory(typeof require === 'function' ? require('./a28-model.js') : root.A28);
+  const api = factory(typeof require === 'function' ? require('./a28-model.js') : root.A28,
+    typeof require === 'function' ? require('./ina219-model.js') : root.INA219Model);
   if (typeof module === 'object' && module.exports) module.exports = api;
   else root.ChargerA = api;
-})(typeof self !== 'undefined' ? self : this, function (A28) {
+})(typeof self !== 'undefined' ? self : this, function (A28, INA219) {
   'use strict';
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const CHARGE_MODES = Object.freeze([
+    { name: 'Yavaş', amps: 1 }, { name: 'SAFE', amps: 1.4 }, { name: 'Dengeli', amps: 2.1 },
+    { name: 'FAST', amps: 2.8 }, { name: 'BOOST', amps: 3.5 }, { name: 'MAX', amps: 4 },
+  ].map(Object.freeze));
 
   // ------------------------------------------------------------------------
   // Varsayılan konfigürasyonlar
@@ -28,8 +33,8 @@
   };
   const HARDWARE_IMPROVED = {
     powerMethod: 'injection',   // CV potu yerine sabit R_üst (tavan 12.60 V); PWM diyot+R ile FB'ye enjekte edilir
-    isense: 'discrete',         // 0.1 Ω low-side şönt + LM358 ×10 (A4) + 10k/4.7k bölücü (A3), kalibreli
-    lcdBus: 'parallel',         // tek LCD paralel (D2–D6, D8): A4 akım girişi olur
+    isense: 'ina219',           // 0.05 Ω high-side şönt; INA219 0x40, LCD 0x27 → A4/A5
+    lcdBus: 'i2c',              // A3 kullanıcı potu, D2/D3/D4 sıcaklık çoklayıcı seçimi
     pwmBits: 10,                // Timer1 10-bit PWM (D9)
   };
   const FIRMWARE_REPORT = {
@@ -41,6 +46,7 @@
     doneDebounceS: 0, subtractShuntDrop: false,
     cellMonitor: false, vccCal: false, watchdog: false, adcAvg: 1, swOvp: false,
     preChargeV: 0, preChargeA: 0.14,
+    tempMux: false,
   };
   const FIRMWARE_IMPROVED = {
     profile: 'improved',
@@ -51,7 +57,9 @@
     sensorCheck: true,          // TMP36 kopuk/kısa devre algılama
     safetyTimerMin: 240,        // toplam şarj süresi sınırı
     doneDebounceS: 5, subtractShuntDrop: true,
-    cellMonitor: true,          // balans uçlarından hücre gerilimi → hiçbir hücre 4.20 V'u aşmaz
+    cutFilterS: 5,             // bitiş akımında PWM kuantalama çukurlarını süz; 5 s onay ayrıca uygulanır
+    ccDeadbandA: 0.02,          // CC ölü bandı: |hata| < 20 mA ise PWM'e dokunma (±1 LSB titremesini keser)
+    cellMonitor: true,          // ölçülen hücre gerilimini sınırlar; gerçek sınır kalibrasyona bağlı
     cellLimitV: 4.20,
     vccCal: true,               // Vcc, dahili 1.1 V bandgap ile ölçülüp ADC dönüşümünde kullanılır
     watchdog: true,             // WDT 1 s: kilitlenmede MCU reset → röle bırakır, PWM güvenli
@@ -59,12 +67,15 @@
     swOvp: true,                // ölçülen paket > CV+20 mV ya da hücre > 4.215 V, 0.5 s → röle açılır (kilitli)
     preChargeV: 3.0,            // bir hücre < 3.0 V ise önce 0.05C ön şarj (derin deşarj koruması)
     preChargeA: 0.14,
+    tempMux: true,             // 3× TMP36 → CD4051 → A0; en sıcak ve en soğuk hücreye göre koruma
+    highRateMinC: 12,          // >2.8 A: üreticinin 10 °C alt sınırına 2 °C ölçüm payı
   };
 
   function defaultConfig() {
     return {
       // Güç katı
-      adapterV: 15, adapterOn: true,
+      adapterV: 19.5, adapterOn: true, // Sony VGP-AC19V14 · 4.7 A / 91.65 W
+      adapterMaxA: 4.7, converterEfficiency: 0.90,
       powerMethod: HARDWARE_IMPROVED.powerMethod,
       // Donanım tavanı (Rev B): CV potu sökülür, yerine sabit R_üst. V_tavan = V_FB·(1 + R_üst/R_alt).
       // XL4015 V_FB = 1.225–1.275 V (±%2) → tavan multimetreyle ölçülüp R_üst düzeltilir (ceilTrim).
@@ -72,7 +83,9 @@
       vrefErrPct: 0,         // bu modülün V_FB sapması (%), datasheet ±2
       ceilTrim: true,        // tavan ölçülüp trimTargetV'ye düzeltildi mi
       trimTargetV: 12.60,
-      xlCcA: 1.6,            // modül CC pot ayarı (donanım akım tavanı)
+      xlCcA: 3.90,           // MAX ≤4 A: pot/ölçüm/ripple toplam +%2 kabul bütçesiyle 3.978 A
+      xlCcErrorPct: 0,       // gerçek sapma; tolerans deneyleri için (otomatik güvenlik kırpması yok)
+      xlCcTolerancePct: 2,   // prototipte doğrulanması gereken toplam üst sapma bütçesi
       xlVref: 1.25,          // XL4015 FB referansı
       // Enjeksiyon (Rev B), TI SLVA861 Denk. 3 ile aynı yapı:
       //   Vout = Vtavan − R_üst · max(0, V_PWM − V_D − V_FB) / (R_filtre + R3)
@@ -100,11 +113,17 @@
       lcdBus: HARDWARE_IMPROVED.lcdBus, // tek LCD: 'i2c' (A4/A5) ya da 'parallel' (D2–D6, D8); ayrık ölçümde paralel gerekir
       adcNoiseLsb: 0.5,
       inaGainErrPct: 0.3,
+      inaBusErrPct: 0.3,
+      inaShuntR: 0.05, inaCalShuntR: 0.05, inaShuntErrPct: 0,
+      inaCurrentLsbA: 0.0002, inaShuntRangeV: 0.32, inaBusRangeV: 16,
+      inaOffsetUv: 0, inaConnected: true,
       tempSensorOk: true,
       tempSensorCell: 1,     // TMP36 hangi hücreye yapışık (0..2)
+      tempSensorFaultIndex: -1, // çoklayıcıda kopuk kanal; -1: hepsi sağlam
       // Firmware
       ...FIRMWARE_IMPROVED,
       fast: false,
+      chargeCurrentA: null,  // null: SAFE/FAST; sayı: canlı kullanıcı ayarı (1.0–4.0 A)
       loopS: 0.5,
       // BMS (tipik 3S 20 A balanslı kart: HY2213 balans + koruma IC)
       bmsPresent: true,      // false: BMS yok, hücreler doğrudan bağlı (koruma yalnız firmware + sigorta)
@@ -139,7 +158,7 @@
   function presetFor(kind) {
     const c = defaultConfig();
     // CC pot = 1.0 A: rapordaki hedef akım (en iyi durum varsayımı)
-    if (kind === 'report') Object.assign(c, HARDWARE_REPORT, FIRMWARE_REPORT, { xlCcA: 1.0 });
+    if (kind === 'report') Object.assign(c, HARDWARE_REPORT, FIRMWARE_REPORT, { xlCcA: 1.0, adapterV: 15 });
     return c;
   }
 
@@ -162,7 +181,7 @@
         params: { rthKW: c.rthKW },
       }));
       this.hw = {
-        duty: 0, vFilt: 0, vOut: 0, xlMode: 'OFF', relay: true,
+        duty: 0, vFilt: 0, vOut: 0, xlMode: 'OFF', relay: false,
         iCharge: 0, iPack: 0, vPack: this.packV(0), fuseBlown: false,
       };
       this.bms = {
@@ -172,11 +191,11 @@
       this.fw = {
         state: 'CC_MODE', dutyF: 0, loopAcc: 0, doneTimer: 0, chargeTime: 0,
         meas: { v: 0, i: 0, t: 25, a0: 0, a2: 0, a3: 0, cells: [0, 0, 0] },
-        sensorT: c.ambientC, lastState: '', noCurrentTimer: 0,
+        sensorT: c.ambientC, sensorTs: [c.ambientC, c.ambientC, c.ambientC], lastState: '', noCurrentTimer: 0,
       };
       this.events = [];
       this.stats = { maxCellV: 0, minCellV: 9, maxTemp: c.ambientC, chargedAh: 0, chargedWh: 0, dischargedAh: 0, dischargedWh: 0,
-        ovpTrips: 0, uvpTrips: 0, doneAt: null, dsgStart: null, dsgEnd: null };
+        ovpTrips: 0, uvpTrips: 0, doneAt: null, dsgStart: null, dsgEnd: null, peakChargeA: 0, maxShuntW: 0 };
       this.history = [];
       this._histAcc = 1e9;
       // İlk ölçüm, firmware başlangıç çıkışı
@@ -188,7 +207,8 @@
     pwmMax() { return (1 << this.cfg.pwmBits) - 1; }
     vcc() { return 5 * (1 + this.cfg.vccErrPct / 100); }
     packV(i) { return this.cells.reduce((a, x) => a + x.terminalV(i), 0); }
-    rShunt() { return this.cfg.isense === 'shunt1' ? 1.0 : this.cfg.isense === 'discrete' ? this.cfg.shuntR : 0.1; }
+    rShunt() { return this.cfg.isense === 'shunt1' ? 1.0 : this.cfg.isense === 'discrete' ? this.cfg.shuntR : INA219.shuntResistance(this.cfg); }
+    hardwareCurrentLimit() { return Math.max(0, this.cfg.xlCcA * (1 + this.cfg.xlCcErrorPct / 100)); }
 
     // --- Güç katı: XL4015'in komut ettiği çıkış ---------------------------
     /** Etkin R_üst: tavan ölçülüp düzeltildiyse hedefe göre, değilse takılan sabit değer. */
@@ -230,8 +250,13 @@
         const vDropMax = c.adapterV - 0.4;                 // XL4015 düşüm (≈0.4 V + I·0.15 Ω)
         const iHead = (vDropMax - vb + load * rc) / (rext + rc + 0.15);
         const iCv = sp.vSet === Infinity ? Infinity : iFor(sp.vSet);
-        i = Math.min(iCv, iHead, c.xlCcA);
-        if (i === c.xlCcA) mode = 'CC(pot)';
+        const pAvailable = c.adapterV * c.adapterMaxA * c.converterEfficiency;
+        const v0 = vb - load * rc, rTotal = rext + rc;
+        const iPower = 2 * pAvailable / (Math.sqrt(v0 * v0 + 4 * rTotal * pAvailable) + v0);
+        const iHardware = this.hardwareCurrentLimit();
+        i = Math.min(iCv, iHead, iHardware, iPower);
+        if (i === iPower) mode = 'POWER';
+        else if (i === iHardware) mode = 'CC(pot)';
         else if (i === iHead) mode = 'DROPOUT';
         else mode = 'CV';
         i = Math.max(0, i);                                // asenkron buck akım çekemez
@@ -326,13 +351,27 @@
     }
     currentMode() { const c = this.cfg; return c.adapterOn ? (c.loadA > 0 ? 'CHARGE+LOAD' : 'CHARGE') : (c.loadA > 0 ? 'USE' : 'REST'); }
 
+    /** Hücreleri, süreyi ve koruma durumunu sıfırlamadan şarj hızını değiştir. */
+    setChargeCurrent(amps) {
+      if (!Number.isFinite(amps)) throw new RangeError('Şarj akımı sonlu bir sayı olmalı');
+      const a = Math.round(clamp(amps, 1, 4) * 10) / 10;
+      this.cfg.chargeCurrentA = a;
+      this.cfg.fast = a > this.cfg.iSafe;
+      this.log(`Şarj hedefi ${a.toFixed(1)} A (${(a / 2.8).toFixed(2)}C); doluluk ve şarj süresi korundu.`);
+      return a;
+    }
+
+    requestedCurrent() {
+      return this.cfg.chargeCurrentA ?? (this.cfg.fast ? this.cfg.iFast : this.cfg.iSafe);
+    }
+
     // --- Ölçüm zinciri ---------------------------------------------------
     /** 10-bit ADC; adcAvg > 1 ise örnek ortalaması (sonuç kesirli kod). */
     adc(vPin) {
       const n = Math.max(1, this.cfg.adcAvg | 0);
       let sum = 0;
       for (let k = 0; k < n; k++) {
-        const noise = (Math.random() * 2 - 1) * this.cfg.adcNoiseLsb;
+        const noise = ((this.random || Math.random)() * 2 - 1) * this.cfg.adcNoiseLsb;
         sum += clamp(Math.round(vPin / this.vcc() * 1023 + noise), 0, 1023);
       }
       return sum / n;
@@ -344,9 +383,12 @@
       const k = this.vccAssumed() / 1023;
       // TMP36: seçilen hücrenin yüzeyinde, ~8 s ısıl gecikme
       const cellT = this.cells[c.tempSensorCell].tempC;
-      const vT = c.tempSensorOk ? 0.5 + f.sensorT / 100 : 0;          // kopuk → 0 V
-      m.a0 = this.adc(vT);
-      m.t = (m.a0 * k - 0.5) * 100;
+      const sensors = c.tempMux ? f.sensorTs : [f.sensorT];
+      const tempCodes = sensors.map((t, i) => this.adc(c.tempSensorOk && (!c.tempMux || c.tempSensorFaultIndex !== i) ? .5 + t / 100 : 0));
+      m.a0 = tempCodes[c.tempMux ? c.tempSensorCell : 0];
+      m.temps = tempCodes.map(code => (code * k - .5) * 100);
+      m.t = Math.max(...m.temps); m.minT = Math.min(...m.temps);
+      m.sensorValid = m.temps.every(t => Number.isFinite(t) && t >= -30 && t <= 110);
       if (c.isense === 'shunt1') {
         // Low-side 1 Ω şönt: bölücü paket+ ile sistem GND arasını görür = Vpaket + I·Rş
         const vNode = h.vPack + h.iCharge * 1.0;
@@ -371,11 +413,10 @@
         const kv = c.vCal ? (this.vcc() / 1023) * (1 + 0.001) / ratio : k * (c.divR1 + c.divR2) / c.divR2;
         m.v = m.a2 * kv - (c.subtractShuntDrop ? m.i * rs : 0);
       } else {
-        // INA219: kendi referansı var, Vcc'den bağımsız. Bus LSB 4 mV, akım LSB ~0.1 mA
-        const g = 1 + c.inaGainErrPct / 100;
-        m.v = Math.round(h.vPack * g / 0.004) * 0.004;
-        m.i = Math.round(h.iCharge * g / 0.0001) * 0.0001;
-        m.a2 = Math.round(m.v / 0.004); m.a3 = Math.round(m.i / 0.0001);
+        m.ina = INA219.read(c, h.iCharge, h.vPack);
+        m.v = m.ina.voltage; m.i = m.ina.current;
+        m.sensorValid = m.sensorValid && m.ina.valid;
+        m.a2 = Math.round(m.v / .004); m.a3 = m.ina.currentRegister;
       }
       if (c.cellMonitor) {
         // Arduino Uno: A0 TMP36, A1/A2 balans uçları (H1+, H2+), A4/A5 I²C. Paket üstü (H3+)
@@ -401,7 +442,11 @@
     }
     ccTarget() {
       const c = this.cfg, T = this.fw.meas.t;
-      let t = c.fast ? c.iFast : c.iSafe;
+      let t = this.requestedCurrent();
+      if (c.profile === 'improved') {
+        t = clamp(t, 0, c.isense === 'ina219' ? 4 : 2.8);
+        if (t > 2.8 && (!c.tempMux || this.fw.meas.minT < c.highRateMinC)) t = 1.4;
+      }
       if (c.preChargeV > 0 && c.cellMonitor && Math.min(...this.fw.meas.cells) < c.preChargeV) return c.preChargeA;
       if (T >= c.tDerate && T < c.tCut) t *= Math.max(0.2, 1 - (T - c.tDerate) / (c.tCut - c.tDerate));
       return t;
@@ -427,10 +472,13 @@
       const off = () => { h.relay = false; f.dutyF = c.powerMethod === 'injection' ? this.pwmMax() : this.pwmMax(); };
 
       // 1) Güvenlik kontrolleri (öncelik sırası)
-      if (c.sensorCheck && (T < -30 || T > 110)) {
-        this.setState('SENSOR_FAULT', `TMP36 okuması mantıksız (${T.toFixed(1)} °C) → şarj durduruldu`, 'bad');
+      if (c.sensorCheck && !m.sensorValid) {
+        this.setState('SENSOR_FAULT', c.isense === 'ina219' && !m.ina.valid ? m.ina.reason : 'Sıcaklık sensörü okuması geçersiz → şarj durduruldu', 'bad');
       }
-      if (f.state === 'SENSOR_FAULT') { off(); if (!(T < -30 || T > 110)) this.setState('CC_MODE', 'Sensör normale döndü → CC_MODE', 'ok'); return; }
+      // Sensör hatası kilitlidir; sıfır/taşmış okuma şarj tamam koşuluna ulaşamaz.
+      if (f.state === 'SENSOR_FAULT') { off(); return; }
+      if (c.profile === 'improved' && m.i > 4.0) this.setState('OC_FAULT', 'Ölçülen şarj akımı 4 A üstünde → röle açıldı (kilitli)', 'bad');
+      if (f.state === 'OC_FAULT') { off(); return; }
       if (c.swOvp) {
         const mc = c.cellMonitor ? Math.max(...m.cells) : 0;
         if (m.v > c.vCv + 0.02 || mc > 4.215) f.ovTimer = (f.ovTimer || 0) + c.loopS; else f.ovTimer = 0;
@@ -446,8 +494,8 @@
         else { off(); return; }
       }
       if (c.lowTempInhibit) {
-        if (T < 0 && f.state !== 'LOW_TEMP') this.setState('LOW_TEMP', `${T.toFixed(1)} °C < 0 °C → şarj yasak (datasheet 0–60 °C)`, 'warn');
-        if (f.state === 'LOW_TEMP') { if (T >= 3) this.setState('CC_MODE', 'Sıcaklık ≥ 3 °C → CC_MODE', 'ok'); else { off(); return; } }
+        if (m.minT < 0 && f.state !== 'LOW_TEMP') this.setState('LOW_TEMP', `${m.minT.toFixed(1)} °C < 0 °C → şarj yasak`, 'warn');
+        if (f.state === 'LOW_TEMP') { if (m.minT >= 3) this.setState('CC_MODE', 'Tüm hücreler ≥ 3 °C → CC_MODE', 'ok'); else { off(); return; } }
       }
       if (f.state === 'TIMEOUT' || f.state === 'CHARGE_DONE') { off(); return; }
       if (c.safetyTimerMin > 0 && f.chargeTime > c.safetyTimerMin * 60) {
@@ -461,9 +509,11 @@
       if (f.state === 'CC_MODE' && c.cellMonitor && maxCell >= c.cellLimitV)
         this.setState('CV_MODE', `Hücre ${m.cells.indexOf(maxCell) + 1} ${maxCell.toFixed(3)} V ≥ ${c.cellLimitV} V → CV_MODE (hücre sınırlı)`, 'ok');
       if (f.state === 'CV_MODE') {
-        if (m.i <= c.iCut) f.doneTimer += c.loopS; else f.doneTimer = 0;
+        const nearCeiling = m.v >= c.vCv - .03 || (c.cellMonitor && maxCell >= c.cellLimitV - .01);
+        const cutCurrent = c.profile === 'improved' ? f.cutCurrent : m.i;
+        if (cutCurrent <= c.iCut && (c.profile !== 'improved' || nearCeiling)) f.doneTimer += c.loopS; else f.doneTimer = 0;
         if (f.doneTimer > c.doneDebounceS && f.chargeTime > 10) {
-          this.setState('CHARGE_DONE', `Akım ${m.i.toFixed(3)} A ≤ ${c.iCut} A → ŞARJ TAMAM`, 'ok');
+          this.setState('CHARGE_DONE', `${c.profile === 'improved' ? 'Filtreli akım' : 'Akım'} ${cutCurrent.toFixed(3)} A ≤ ${c.iCut} A → ŞARJ TAMAM`, 'ok');
           this.stats.doneAt = this.t; off(); return;
         }
       }
@@ -474,11 +524,18 @@
       // Her iki yöntemde de duty ↑ ⇒ çıkış ↓ (enjeksiyonda FB'ye akım basılır; doğrudan
       // FB'de eşik aşılınca çıkış kapanır). Doğrudan FB için bu "en iyi durum"dur:
       // firmware polaritesi doğru varsayılır.
-      if (f.state === 'CC_MODE') f.dutyF -= 3.0 * scale * (this.ccTarget() - m.i);
+      if (f.state === 'CC_MODE') {
+        const err = this.ccTarget() - m.i;
+        if (Math.abs(err) > (c.ccDeadbandA || 0)) f.dutyF -= 3.0 * scale * err;
+      }
       else {
         let errV = c.vCv - m.v;
         if (c.cellMonitor) errV = Math.min(errV, 3 * (c.cellLimitV - maxCell));
-        f.dutyF -= 40 * scale * errV;
+        // CV sırasında da mod değişimi ve termal akım sınırı geçerlidir.
+        // İki regülatörden çıkışı daha çok kısan kazanır; gerilim tavanı korunur.
+        const excessI = m.i - this.ccTarget();
+        const currentCorrection = Math.abs(excessI) > (c.ccDeadbandA || 0) ? 3 * scale * excessI : 0;
+        f.dutyF += Math.max(-40 * scale * errV, currentCorrection);
       }
       f.dutyF = clamp(f.dutyF, 0, max);
     }
@@ -509,9 +566,12 @@
       // TMP36 ısıl gecikmesi
       const cellT = this.cells[c.tempSensorCell].tempC;
       f.sensorT += (cellT - f.sensorT) * (1 - Math.exp(-dt / 8));
+      f.sensorTs.forEach((t, k) => { f.sensorTs[k] += (this.cells[k].tempC - t) * (1 - Math.exp(-dt / 8)); });
 
       if (f.state === 'CC_MODE' || f.state === 'CV_MODE') f.chargeTime += dt;
       this.stats.chargedAh += Math.max(0, h.iPack) * dt / 3600;
+      this.stats.peakChargeA = Math.max(this.stats.peakChargeA, h.iCharge);
+      this.stats.maxShuntW = Math.max(this.stats.maxShuntW, h.iCharge ** 2 * this.rShunt());
       this.stats.chargedWh += Math.max(0, h.iPack) * h.vPack * dt / 3600;
       if (h.iPack < -1e-3) {
         if (this.stats.dsgStart == null) this.stats.dsgStart = this.t;
@@ -526,6 +586,8 @@
       while (f.loopAcc >= c.loopS - 1e-9) {
         f.loopAcc -= c.loopS;
         this.measure();
+        f.cutCurrent = f.cutCurrent == null ? f.meas.i : f.cutCurrent +
+          (f.meas.i - f.cutCurrent) * (1 - Math.exp(-c.loopS / Math.max(.001, c.cutFilterS || .001)));
         if (c.fwFrozen) {
           f.frozenFor = (f.frozenFor || 0) + c.loopS;
           if (c.watchdog && f.frozenFor >= 1.0) {
@@ -575,6 +637,7 @@
       return {
         state: this.fw.state,
         doneMin: s.doneAt != null ? s.doneAt / 60 : null,
+        peakChargeA: s.peakChargeA, maxShuntW: s.maxShuntW,
         maxCellV: s.maxCellV, minCellV: s.minCellV, maxTemp: s.maxTemp, chargedAh: s.chargedAh, ovpTrips: s.ovpTrips,
         dischargedAh: s.dischargedAh, dischargedWh: s.dischargedWh, uvpTrips: s.uvpTrips,
         finalSoc: this.cells.map(x => x.soc),
@@ -583,5 +646,5 @@
     }
   }
 
-  return { SystemA, defaultConfig, presetFor, REALISTIC_CELLS, IDEAL_CELLS, ceilingOf, gainOf, rTopEff, vrefOf, HARDWARE_REPORT, HARDWARE_IMPROVED, FIRMWARE_REPORT, FIRMWARE_IMPROVED };
+  return { SystemA, defaultConfig, presetFor, REALISTIC_CELLS, IDEAL_CELLS, ceilingOf, gainOf, rTopEff, vrefOf, HARDWARE_REPORT, HARDWARE_IMPROVED, FIRMWARE_REPORT, FIRMWARE_IMPROVED, CHARGE_MODES, INA219 };
 });
