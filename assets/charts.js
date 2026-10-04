@@ -19,6 +19,15 @@
     return (n < 1.5 ? 1 : n < 3 ? 2 : n < 7 ? 5 : 10) * mag;
   }
   const css = name => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  // Renkler CSS tokenı (örn. --ink) veya doğrudan renk değeri olabilir.
+  const color = value => value && value.startsWith('--') ? css(value) : value;
+  const charts = new WeakMap();
+  window.addEventListener('themechange', () => {
+    document.querySelectorAll('canvas').forEach(canvas => {
+      const chart = charts.get(canvas);
+      if (chart && chart.last) chart.draw(chart.last.rows, chart.last.opt);
+    });
+  });
 
   class LineChart {
     constructor(canvas, opts) {
@@ -26,6 +35,7 @@
       this.o = opts;
       this.hoverX = null;
       this.last = null;
+      charts.set(canvas, this);
       canvas.addEventListener('pointermove', e => {
         const r = canvas.getBoundingClientRect();
         this.hoverX = e.clientX - r.left;
@@ -92,11 +102,11 @@
         for (let v = Math.ceil(a.min / st) * st; v <= a.max + 1e-9; v += st) {
           const y = Y(v, ax);
           if (side === 'l') { ctx.strokeStyle = grid; ctx.beginPath(); ctx.moveTo(M.l, y); ctx.lineTo(M.l + pw, y); ctx.stroke(); }
-          ctx.fillStyle = a.color || text;
+          ctx.fillStyle = color(a.color) || text;
           ctx.fillText(+v.toFixed(3) + '', side === 'l' ? M.l - 6 : M.l + pw + 6, y);
         }
         // Eksen birimi: eksenin tepesinde, yatay
-        ctx.fillStyle = a.color || text; ctx.textBaseline = 'alphabetic';
+        ctx.fillStyle = color(a.color) || text; ctx.textBaseline = 'alphabetic';
         ctx.textAlign = side === 'l' ? 'right' : 'left';
         ctx.fillText(a.label || '', side === 'l' ? M.l - 6 : M.l + pw + 6, M.t - 8);
       };
@@ -107,14 +117,14 @@
       // Referans çizgileri
       (o.refLines || []).forEach(r => {
         const y = Y(r.value, r.axis);
-        ctx.strokeStyle = r.color; ctx.setLineDash([5, 5]); ctx.lineWidth = 1;
+        ctx.strokeStyle = color(r.color); ctx.setLineDash([5, 5]); ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(M.l, y); ctx.lineTo(M.l + pw, y); ctx.stroke(); ctx.setLineDash([]);
-        ctx.fillStyle = r.color; ctx.textAlign = r.right ? 'right' : 'left'; ctx.textBaseline = r.below ? 'top' : 'bottom';
+        ctx.fillStyle = color(r.color); ctx.textAlign = r.right ? 'right' : 'left'; ctx.textBaseline = r.below ? 'top' : 'bottom';
         ctx.fillText(r.label, r.right ? M.l + pw - 6 : M.l + 6, r.below ? y + 2 : y - 2);
       });
       // Datasheet üst üste bindirmeleri
       (opt.overlays || []).forEach(ov => {
-        ctx.fillStyle = ov.color; ctx.strokeStyle = ov.color;
+        ctx.fillStyle = color(ov.color); ctx.strokeStyle = color(ov.color);
         ov.points.forEach(p => {
           ctx.beginPath(); ctx.arc(X(p[0]), Y(p[1], ov.axis), 3, 0, Math.PI * 2);
           ov.hollow ? ctx.stroke() : ctx.fill();
@@ -123,7 +133,7 @@
       // Seriler
       o.series.forEach(s => {
         if (s.hidden) return;
-        ctx.strokeStyle = s.color; ctx.lineWidth = s.width || 2; ctx.setLineDash(s.dash || []);
+        ctx.strokeStyle = color(s.color); ctx.lineWidth = s.width || 2; ctx.setLineDash(s.dash || []);
         ctx.beginPath();
         let started = false;
         for (const r of (s.rows || rows)) {
@@ -145,7 +155,7 @@
         ctx.strokeStyle = axis; ctx.beginPath(); ctx.moveTo(x, M.t); ctx.lineTo(x, M.t + ph); ctx.stroke();
         const lines = [`${(best[xKey] * xs).toFixed(1)} ${o.xLabel || ''}`].concat(o.series.filter(s => !s.hidden).map(s => {
           const v = typeof s.key === 'function' ? s.key(best) : best[s.key];
-          return { t: `${s.label}: ${v == null ? '—' : v.toFixed(s.digits ?? 3)}`, c: s.color };
+          return { t: `${s.label}: ${v == null ? '—' : v.toFixed(s.digits ?? 3)}`, c: color(s.color) };
         }));
         const bw = 150, bh = 16 * lines.length + 8;
         const bx = x + 10 + bw > M.l + pw ? x - bw - 10 : x + 10;

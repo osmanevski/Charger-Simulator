@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Doğrulama Raporu — 3S A28</title>
-<link rel="stylesheet" href="assets/bench.css?v=20260926-six-modes">
+<script src="assets/theme.js?v=20261004-dark-mode"></script>
+<link rel="stylesheet" href="assets/bench.css?v=20261004-soft-dark">
 <style>
   body { background: var(--paper); }
   .doc { max-width: 1060px; margin: 0 auto; padding: 18px 18px 40px; }
@@ -25,12 +26,12 @@
   .stats > div { padding: 8px 12px 10px 0; }
   .stats .v { font-family: var(--font-data); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
   .stats .s { font-size: 12px; color: var(--ink-2); }
-  .chartbox { height: 300px; border: 1px solid var(--rule); background: #fff; position: relative; }
+  .chartbox { height: 300px; border: 1px solid var(--rule); background: var(--surface); position: relative; }
   .chartbox canvas { position: absolute; inset: 6px 8px; width: calc(100% - 16px); height: calc(100% - 12px); display: block; }
   .matrix td { font-size: 13px; }
   .matrix .nums { color: var(--ink-3); font-size: 11.5px; font-family: var(--font-data); font-stretch: 87%; font-variant-numeric: tabular-nums; }
   .mk { font-family: var(--font-mono); font-weight: 700; width: 18px; display: inline-block; }
-  .mk.ok { color: var(--cv); } .mk.warn { color: #b7791f; } .mk.bad { color: var(--fault); }
+  .mk.ok { color: var(--cv); } .mk.warn { color: var(--warn); } .mk.bad { color: var(--fault); }
   .progress { height: 3px; background: var(--grid); margin: 8px 0 12px; } .progress i { display: block; height: 100%; width: 0; background: var(--ink); transition: width .2s; }
   ul.assume { margin: 0; padding-left: 18px; color: var(--ink-2); } ul.assume li { margin: 5px 0; } ul.assume b { color: var(--ink); }
   .keys { margin-top: 6px; }
@@ -49,7 +50,10 @@
       <div class="eyebrow" style="font-size:11px;color:var(--ink-3)">Test raporu · tarayıcıda yeniden hesaplanır</div>
       <h1>Doğrulama <span>3S · INR18650A28</span></h1>
     </div>
-    <a class="btn" href="index.html">← Şarj tezgâhı</a>
+    <div class="transport">
+      <a class="btn" href="index.html">← Şarj tezgâhı</a>
+      <button class="btn theme-toggle" type="button" data-theme-toggle aria-pressed="false"><span aria-hidden="true">◐</span> Koyu mod</button>
+    </div>
   </div>
 
   <section class="page">
@@ -139,13 +143,12 @@
 <script src="assets/charger-a.js?v=20260926-six-modes"></script>
 <script src="assets/scenarios-a.js?v=20260926-six-modes"></script>
 <script src="assets/reconfig-model.js?v=20260926-six-modes"></script>
-<script src="assets/charts.js?v=20260926-six-modes"></script>
+<script src="assets/charts.js?v=20261004-dark-mode"></script>
 <script src="assets/charge-results.js?v=20260926-six-modes"></script>
 <script>
 (function () {
   'use strict';
   const $ = id => document.getElementById(id);
-  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : '—';
   const icon = { ok: '✓', warn: '!', bad: '✕' };
   const avg = a => a.reduce((x, y) => x + y, 0) / a.length;
@@ -161,11 +164,11 @@
   $('cellStats').innerHTML = st(`${fmt(Math.sqrt(se / DS.length) * 1000, 1)} mV`, 'gerilim RMSE') + st(`${fmt(cv, 1)} dk`, 'CC→CV · datasheet ≈ 114.5') +
     st(`${fmt(end.t, 1)} dk`, 'bitiş · datasheet ≈ 131') + st(`${fmt(end.q * 1000, 0)} mAh`, 'kapasite · datasheet ≈ 2832');
   const chCell = new LineChart($('chCell'), { xLabel: 'dk',
-    left: { min: 3.2, max: 4.4, label: 'V', color: cssv('--ink') }, right: { min: 0, max: 1.6, label: 'A', color: cssv('--a28') },
-    series: [{ key: 'v', color: cssv('--ink'), label: 'model V' }, { key: 'i', color: cssv('--a28'), axis: 'right', label: 'model I' }] });
+    left: { min: 3.2, max: 4.4, label: 'V', color: '--ink' }, right: { min: 0, max: 1.6, label: 'A', color: '--a28' },
+    series: [{ key: 'v', color: '--ink', label: 'model V' }, { key: 'i', color: '--a28', axis: 'right', label: 'model I' }] });
   const drawCell = () => chCell.draw(ref, { xMax: 140, overlays: [
-    { points: DS.map(p => [p[0], p[1]]), axis: 'left', color: cssv('--ink'), hollow: true },
-    { points: DS.map(p => [p[0], p[2]]), axis: 'right', color: cssv('--a28'), hollow: true }] });
+    { points: DS.map(p => [p[0], p[1]]), axis: 'left', color: '--ink', hollow: true },
+    { points: DS.map(p => [p[0], p[2]]), axis: 'right', color: '--a28', hollow: true }] });
 
   // Deşarj ↔ datasheet
   const dref = A28.runReferenceDischarge({ i: 2.9 }), DD = A28.DATASHEET_DISCHARGE_29A;
@@ -175,20 +178,20 @@
   const dEnd = dref[dref.length - 1];
   $('dsgStats').innerHTML = st(`${fmt(Math.sqrt(sd / nd) * 1000, 1)} mV`, 'RMSE, 0–2.6 Ah') + st(`${fmt(knee * 1000, 0)} mV`, 'maks. sapma, diz bölgesi') +
     st(`${fmt(dEnd.q * 1000, 0)} mAh`, 'kapasite · datasheet ≈ 2820') + st(`+${fmt(dEnd.T - 25, 1)} K`, 'ısınma · datasheet ≈ +6');
-  const chDsg = new LineChart($('chDsg'), { xLabel: 'Ah', left: { min: 2.4, max: 4.3, label: 'V', color: cssv('--ink') },
-    series: [{ key: 'v', color: cssv('--cc'), label: 'model V' }] });
-  const drawDsg = () => chDsg.draw(dref, { xKey: 'q', xMax: 3, overlays: [{ points: DD, axis: 'left', color: cssv('--cc'), hollow: true }] });
+  const chDsg = new LineChart($('chDsg'), { xLabel: 'Ah', left: { min: 2.4, max: 4.3, label: 'V', color: '--ink' },
+    series: [{ key: 'v', color: '--cc', label: 'model V' }] });
+  const drawDsg = () => chDsg.draw(dref, { xKey: 'q', xMax: 3, overlays: [{ points: DD, axis: 'left', color: '--cc', hollow: true }] });
 
   // Rev A ↔ Rev B
   const run = p => { const s = new ChargerA.SystemA(ChargerA.presetFor(p)); s.runUntilDone(4); return s; };
   const B = run('improved'), A = run('report');
   const chCmp = new LineChart($('chCmp'), { xLabel: 'dk',
-    left: { min: 10, max: 13.2, label: 'V', color: cssv('--ink') }, right: { min: 0, max: 1.6, label: 'A', color: cssv('--a28') },
+    left: { min: 10, max: 13.2, label: 'V', color: '--ink' }, right: { min: 0, max: 1.6, label: 'A', color: '--a28' },
     series: [
-      { key: 'v', rows: B.history, color: cssv('--ink'), label: 'B V' }, { key: 'i', rows: B.history, color: cssv('--a28'), axis: 'right', label: 'B I', width: 1.5 },
-      { key: 'v', rows: A.history, color: cssv('--fault'), label: 'A V' }, { key: 'vMeas', rows: A.history, color: cssv('--fault'), dash: [5, 4], width: 1.4, label: 'A ölçülen' },
-      { key: 'i', rows: A.history, color: cssv('--cc'), axis: 'right', label: 'A I', width: 1.5 }],
-    refLines: [{ axis: 'left', value: 12.6, color: cssv('--ink-3'), label: '12.60 V', right: true }] });
+      { key: 'v', rows: B.history, color: '--ink', label: 'B V' }, { key: 'i', rows: B.history, color: '--a28', axis: 'right', label: 'B I', width: 1.5 },
+      { key: 'v', rows: A.history, color: '--fault', label: 'A V' }, { key: 'vMeas', rows: A.history, color: '--fault', dash: [5, 4], width: 1.4, label: 'A ölçülen' },
+      { key: 'i', rows: A.history, color: '--cc', axis: 'right', label: 'A I', width: 1.5 }],
+    refLines: [{ axis: 'left', value: 12.6, color: '--ink-3', label: '12.60 V', right: true }] });
   const drawCmp = () => chCmp.draw(B.history, { xScale: 1 / 60 });
   const sa = A.summary(), sb = B.summary();
   $('verdict').innerHTML =
@@ -234,8 +237,8 @@
     const gens = [['yes', ScenariosA.cycleTest({ bms: true, cycles: N })], ['no', ScenariosA.cycleTest({ bms: false, cycles: N })]];
     const opts = ro => ({ xLabel: 'çevrim', left: ro, pad: { l: 40, r: 12 }, series: [], refLines: [] });
     const cS = new LineChart($('chCycS'), opts({ min: 0, max: 8, label: '%' })), cM = new LineChart($('chCycM'), opts({ min: 2.3, max: 3.0, label: 'V' }));
-    const mk = key => [{ key, rows: data.yes, color: cssv('--cv'), label: 'BMS var', width: 2 }, { key, rows: data.no, color: cssv('--fault'), label: 'BMS yok', width: 2 }];
-    cM.o.refLines = [{ axis: 'left', value: 2.5, color: cssv('--fault'), label: '2.50 V', right: true }];
+    const mk = key => [{ key, rows: data.yes, color: '--cv', label: 'BMS var', width: 2 }, { key, rows: data.no, color: '--fault', label: 'BMS yok', width: 2 }];
+    cM.o.refLines = [{ axis: 'left', value: 2.5, color: '--fault', label: '2.50 V', right: true }];
     let g = 0;
     const draw = () => { cS.o.series = mk('spread'); cM.o.series = mk('minV'); cS.draw([{ n: 0 }], { xKey: 'n', xMin: 1, xMax: N }); cM.draw([{ n: 0 }], { xKey: 'n', xMin: 1, xMax: N }); };
     const step = () => {

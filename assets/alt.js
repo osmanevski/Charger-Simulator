@@ -5,7 +5,6 @@
   const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : '—';
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const hms = s => { s = Math.max(0, Math.floor(s)); return [s / 3600 | 0, (s % 3600) / 60 | 0, s % 60].map(v => String(v).padStart(2, '0')).join(':'); };
-  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const pct = x => fmt(clamp(x, 0, 1) * 100, 0);
 
   const META = { author: 'Osman Çekilmez · 233302006', advisor: 'Dr. Öğr. Üyesi Osman Özer', date: '24.09.2026' };
@@ -89,15 +88,15 @@
 
   // --- Grafikler ---------------------------------------------------------
   const chI = new LineChart($('chI'), { xLabel: 'dk', minSpan: 30, left: { min: -3.5, max: 4.5, label: 'A' },
-    series: [{ key: 'i1', color: cssv('--c1'), label: 'H1' }, { key: 'i2', color: cssv('--c2'), label: 'H2' }, { key: 'i3', color: cssv('--c3'), label: 'H3' },
-      { key: 'it', color: cssv('--ink'), label: 'toplam', dash: [4, 4], width: 1.3 }],
-    refLines: [{ axis: 'left', value: 0, color: cssv('--ink-3'), label: '0', right: true }] });
+    series: [{ key: 'i1', color: '--c1', label: 'H1' }, { key: 'i2', color: '--c2', label: 'H2' }, { key: 'i3', color: '--c3', label: 'H3' },
+      { key: 'it', color: '--ink', label: 'toplam', dash: [4, 4], width: 1.3 }],
+    refLines: [{ axis: 'left', value: 0, color: '--ink-3', label: '0', right: true }] });
   const P2 = {
-    v: { left: { min: 2.8, max: 4.4, label: 'V', step: 0.4 }, series: ['c1', 'c2', 'c3'], ref: [{ axis: 'left', value: 4.2, color: cssv('--cv'), label: '4.20 V', below: true }, { axis: 'left', value: 3.0, color: cssv('--fault'), label: 'kullanım kesme 3.0 V', right: true }] },
+    v: { left: { min: 2.8, max: 4.4, label: 'V', step: 0.4 }, series: ['c1', 'c2', 'c3'], ref: [{ axis: 'left', value: 4.2, color: '--cv', label: '4.20 V', below: true }, { axis: 'left', value: 3.0, color: '--fault', label: 'kullanım kesme 3.0 V', right: true }] },
     soc: { left: { min: 0, max: 100, label: '%' }, series: ['soc1', 'soc2', 'soc3'], ref: [] },
   };
   const mk2 = k => new LineChart($('ch2'), { xLabel: 'dk', minSpan: 30, left: P2[k].left,
-    series: P2[k].series.map((key, i) => ({ key, color: cssv('--c' + (i + 1)), label: 'H' + (i + 1), digits: k === 'soc' ? 1 : 3 })), refLines: P2[k].ref });
+    series: P2[k].series.map((key, i) => ({ key, color: '--c' + (i + 1), label: 'H' + (i + 1), digits: k === 'soc' ? 1 : 3 })), refLines: P2[k].ref });
   let ch2 = mk2('v');
   document.querySelectorAll('[data-plot]').forEach(b => b.addEventListener('click', () => {
     plot2 = b.dataset.plot; document.querySelectorAll('[data-plot]').forEach(x => x.setAttribute('aria-pressed', x === b));

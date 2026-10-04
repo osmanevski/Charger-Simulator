@@ -5,7 +5,6 @@
   const fmt = (x, d = 2) => Number.isFinite(x) ? x.toFixed(d) : '—';
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const hms = s => { s = Math.max(0, Math.floor(s)); return [s / 3600 | 0, (s % 3600) / 60 | 0, s % 60].map(v => String(v).padStart(2, '0')).join(':'); };
-  const cssv = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
   const app = $('app');
 
   const META = { author: 'Osman Çekilmez · 233302006', advisor: 'Dr. Öğr. Üyesi Osman Özer', date: '26.09.2026' };
@@ -347,35 +346,35 @@
   const PAD = { l: 46, r: 16 };
   const chV = new LineChart($('chV'), {
     xLabel: 'dk', minSpan: 30, pad: PAD, hideX: true,
-    left: { min: 9, max: 13.4, label: 'V', color: cssv('--ink') },
+    left: { min: 9, max: 13.4, label: 'V', color: '--ink' },
     series: [
-      { key: 'v', color: cssv('--ink'), label: 'V gerçek' },
-      { key: 'vMeas', color: cssv('--fault'), label: 'V ölçülen', dash: [4, 4], width: 1.4 },
+      { key: 'v', color: '--ink', label: 'V gerçek' },
+      { key: 'vMeas', color: '--fault', label: 'V ölçülen', dash: [4, 4], width: 1.4 },
     ],
-    refLines: [{ axis: 'left', value: 12.6, color: cssv('--ink-3'), label: '12.60 V', right: true }],
+    refLines: [{ axis: 'left', value: 12.6, color: '--ink-3', label: '12.60 V', right: true }],
   });
   const chI = new LineChart($('chI'), {
     xLabel: 'dk', minSpan: 30, pad: PAD,
-    left: { min: -3, max: 2, label: 'A', color: cssv('--ink-2') },
+    left: { min: -3, max: 2, label: 'A', color: '--ink-2' },
     series: [
-      { key: r => (r.ip >= -0.002 ? r.ip : null), color: cssv('--a28'), label: '+ şarj', width: 1.6 },
-      { key: r => (r.ip <= 0.002 ? r.ip : null), color: cssv('--cc'), label: '− deşarj', width: 1.6 },
+      { key: r => (r.ip >= -0.002 ? r.ip : null), color: '--a28', label: '+ şarj', width: 1.6 },
+      { key: r => (r.ip <= 0.002 ? r.ip : null), color: '--cc', label: '− deşarj', width: 1.6 },
     ],
-    refLines: [{ axis: 'left', value: 0, color: cssv('--ink-3'), label: '' }],
+    refLines: [{ axis: 'left', value: 0, color: '--ink-3', label: '' }],
   });
   const PLOT2 = {
     cells: {
       opts: { xLabel: 'dk', minSpan: 30, left: { min: 2.4, max: 4.5, label: 'V', step: 0.5 },
-        series: [{ key: 'c1', color: cssv('--c1'), label: 'H1' }, { key: 'c2', color: cssv('--c2'), label: 'H2' }, { key: 'c3', color: cssv('--c3'), label: 'H3' }],
-        refLines: [{ axis: 'left', value: 4.2, color: cssv('--cv'), label: '4.20 V', below: true }, { axis: 'left', value: 4.25, color: cssv('--fault'), label: 'BMS OVP', right: true },
-          { axis: 'left', value: 2.5, color: cssv('--fault'), label: 'BMS UVP 2.50 V', right: true }] },
+        series: [{ key: 'c1', color: '--c1', label: 'H1' }, { key: 'c2', color: '--c2', label: 'H2' }, { key: 'c3', color: '--c3', label: 'H3' }],
+        refLines: [{ axis: 'left', value: 4.2, color: '--cv', label: '4.20 V', below: true }, { axis: 'left', value: 4.25, color: '--fault', label: 'BMS OVP', right: true },
+          { axis: 'left', value: 2.5, color: '--fault', label: 'BMS UVP 2.50 V', right: true }] },
       keys: `<span><i style="color:var(--c1)"></i>H1</span><span><i style="color:var(--c2)"></i>H2</span><span><i style="color:var(--c3)"></i>H3</span><span><i class="dash" style="color:var(--cv)"></i>4.20 V sınırı</span>`,
     },
     temp: {
-      opts: { xLabel: 'dk', minSpan: 30, left: { min: -10, max: 60, label: '°C', color: cssv('--cc') }, right: { min: 0, max: 100, label: 'PWM %', color: cssv('--ink-3') },
-        series: [{ key: 'T', color: cssv('--cc'), label: 'Hücre', digits: 1 }, { key: 'Ts', color: cssv('--fault'), label: 'TMP36', dash: [4, 4], width: 1.4, digits: 1 },
-          { key: 'duty', color: cssv('--ink-3'), axis: 'right', label: 'PWM', width: 1.1, digits: 0 }],
-        refLines: [{ axis: 'left', value: 45, color: cssv('--fault'), label: 'kesme 45 °C', right: true }, { axis: 'left', value: 0, color: cssv('--a28'), label: '0 °C', right: true }] },
+      opts: { xLabel: 'dk', minSpan: 30, left: { min: -10, max: 60, label: '°C', color: '--cc' }, right: { min: 0, max: 100, label: 'PWM %', color: '--ink-3' },
+        series: [{ key: 'T', color: '--cc', label: 'Hücre', digits: 1 }, { key: 'Ts', color: '--fault', label: 'TMP36', dash: [4, 4], width: 1.4, digits: 1 },
+          { key: 'duty', color: '--ink-3', axis: 'right', label: 'PWM', width: 1.1, digits: 0 }],
+        refLines: [{ axis: 'left', value: 45, color: '--fault', label: 'kesme 45 °C', right: true }, { axis: 'left', value: 0, color: '--a28', label: '0 °C', right: true }] },
       keys: `<span><i style="color:var(--cc)"></i>hücre sıcaklığı</span><span><i class="dash" style="color:var(--fault)"></i>TMP36 okuması</span><span><i style="color:var(--ink-3)"></i>PWM duty</span>`,
     },
   };
@@ -390,12 +389,12 @@
     const s0 = cfg.cells.reduce((a, c) => a + c.soc, 0) / 3;
     const shift = (s0 - 0.015) * A28.PARAMS.capacityAh / 1.4 * 60;
     const pts = A28.DATASHEET_CHARGE_05C.map(([t, v, i]) => [t - shift, v * 3, i]).filter(p => p[0] >= 0);
-    const col = cssv('--cc');
+    const col = '--cc';
     return [{ points: pts.map(p => [p[0], p[1]]), axis: 'left', color: col, hollow: true }, { points: pts.map(p => [p[0], p[2]]), axis: 'left', color: col, hollow: true }];
   }
   /** Datasheet 2.9 A deşarj eğrisi, deşarjın başladığı ana ve başlangıç SOC'una hizalı. */
   function dsgOverlay() {
-    const t0 = sys.stats.dsgStart / 60, q0 = (1 - dsgSoc0) * A28.PARAMS.capacityAh, col = cssv('--cc');
+    const t0 = sys.stats.dsgStart / 60, q0 = (1 - dsgSoc0) * A28.PARAMS.capacityAh, col = '--cc';
     const pts = A28.DATASHEET_DISCHARGE_29A.filter(([q]) => q >= q0).map(([q, v]) => [t0 + (q - q0) / 2.9 * 60, v * 3]);
     return [{ points: pts, axis: 'left', color: col, hollow: true }];
   }
@@ -540,14 +539,14 @@
   function drawCyc() {
     const N = Math.max(5, +$('cycN').value || 30);
     const mk = (key, digits) => [
-      { key, rows: cycData.yes, color: cssv('--cv'), label: 'BMS var', width: 2, digits },
-      { key, rows: cycData.no, color: cssv('--fault'), label: 'BMS yok', width: 2, digits }];
+      { key, rows: cycData.yes, color: '--cv', label: 'BMS var', width: 2, digits },
+      { key, rows: cycData.no, color: '--fault', label: 'BMS yok', width: 2, digits }];
     chSpread.o.series = mk('spread', 2);
     const all = [...cycData.yes, ...cycData.no];
     chSpread.o.left.max = Math.max(2, Math.ceil(Math.max(0, ...all.map(r => r.spread)) + 0.5));
     chMin.o.series = mk('minV', 2);
     chMin.o.left.min = Math.min(2.3, Math.floor((Math.min(3, ...all.map(r => r.minV)) - 0.05) * 10) / 10);
-    chMin.o.refLines = [{ axis: 'left', value: 2.5, color: cssv('--fault'), label: '2.50 V datasheet deşarj sonu', right: true }];
+    chMin.o.refLines = [{ axis: 'left', value: 2.5, color: '--fault', label: '2.50 V datasheet deşarj sonu', right: true }];
     chSpread.draw([{ n: 0 }], { xKey: 'n', xMin: 1, xMax: N });
     chMin.draw([{ n: 0 }], { xKey: 'n', xMin: 1, xMax: N });
   }

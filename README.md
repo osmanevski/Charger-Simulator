@@ -2,6 +2,8 @@
 
 3S Li-ion CC/CV şarj devresi için çevrimdışı simülasyon. Tarayıcıda `index.html` dosyasını açmak yeterli; internet ve kurulum gerekmez (fontlar `assets/fonts/` içinde gömülü).
 
+**Tema:** Üç sayfanın üstündeki **Koyu mod** düğmesiyle açık/koyu görünüm değiştirilebilir. İlk açılışta sistem teması izlenir; elle yapılan seçim tarayıcıda saklanır. Devre şemaları ve grafikler tema değişimine anında uyum sağlar.
+
 ## Sayfalar
 
 | Sayfa | İçerik |
