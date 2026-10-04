@@ -25,6 +25,7 @@
   --rule: #c7d3d6;
   --a28: #2790c8;
   --a28-soft: #d6ebf6;
+  --selection-background: #d6ebf6;
   --cv: #15905a;
   --cc: #e0621f;
   --fault: #c0263a;
@@ -57,18 +58,19 @@ html[data-theme="dark"] {
   --sheet: #0b1022;
   --surface: #11172a;
   --grid: #141b2e;
-  --ink: #b5c2cb;
+  --ink: #e0e0e0;
   --ink-2: #96a6b1;
   --ink-3: #8295a2;
   --rule: #293349;
   --a28: #79a5bd;
-  --a28-soft: #1c2a40;
+  --a28-soft: #273d4c;
+  --selection-background: #273d4c;
   --cv: #80ac95;
   --cc: #c6a17d;
   --fault: #cf9198;
   --redline: #b996b2;
   --panel: #080c1c;
-  --panel-ink: #bccbd4;
+  --panel-ink: #e0e0e0;
   --panel-dim: #8497a3;
   --c1: var(--a28);
   --c2: var(--cc);
@@ -95,6 +97,7 @@ body {
 }
 button, input, select { font: inherit; color: inherit; }
 button { cursor: pointer; }
+::selection { background: var(--selection-background); color: var(--ink); }
 a { color: var(--a28); }
 :focus-visible { outline: 2px solid var(--a28); outline-offset: 2px; }
 [hidden] { display: none !important; }
